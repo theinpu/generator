@@ -1,0 +1,6 @@
+<?php
+
+return array(
+    'def.path' => __DIR__.'/../def/',
+    'save.path' => __DIR__.'/../gen/'
+);

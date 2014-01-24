@@ -7,6 +7,13 @@
 
 namespace bc\generator;
 
-class GeneratorCLI {
+use Symfony\Component\Console\Application;
 
-} 
+class GeneratorCLI extends Application {
+
+    public function __construct() {
+        parent::__construct('Model generator');
+
+        $this->add(new GeneratorCommand());
+    }
+}

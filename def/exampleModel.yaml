@@ -1,0 +1,15 @@
+name: ExampleModel
+class: \bc\model\ExampleModel
+parent: \bc\model\Model
+parentDescription: model
+table: example
+fields:
+  title:
+    type: string
+    sqlType: VARCHAR(100)
+    flags: [NN]
+paths:
+  base: model
+  dataMap: dataMaps
+  builder: '%same%'
+  factory: '%same%'

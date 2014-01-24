@@ -1,2 +1,10 @@
 #!/usr/bin/php
 <?php
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+chdir(__DIR__.'/..');
+
+$cli = new \bc\generator\GeneratorCLI();
+
+$cli->run();
