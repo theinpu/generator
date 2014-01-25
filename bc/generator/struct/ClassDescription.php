@@ -40,10 +40,10 @@ class ClassDescription extends Description {
             $out .= ' implements ' . implode(', ', $this->interfaces);
         }
         $out .= ' {';
-        $out .= $this->insertFields();
-        $out .= $this->insertMethods();
+        $out .= $this->indent($this->insertFields());
+        $out .= $this->indent($this->insertMethods());
 
-        $out .= '}';
+        $out .= "\n}";
 
         return $out;
     }

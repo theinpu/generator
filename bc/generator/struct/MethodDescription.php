@@ -24,7 +24,7 @@ class MethodDescription extends Description {
         $out .= $this->insertParams();
         $out .= ') {';
         if (!empty($this->code)) {
-            $out .= "\n" . $this->code . "\n";
+            $out .= "\n" . $this->indent($this->code) . "\n";
         }
         $out .= '}';
 

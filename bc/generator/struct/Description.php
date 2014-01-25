@@ -92,4 +92,13 @@ class Description implements Exportable {
         return $out;
     }
 
+    protected function indent($text) {
+        if (empty($text)) return $text;
+        $lines = explode("\n", $text);
+        foreach ($lines as &$line) {
+            $line = "\t" . $line;
+        }
+        return implode("\n", $lines);
+    }
+
 }
