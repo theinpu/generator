@@ -1,5 +1,6 @@
 name: ExampleController
 class: \bc\example\controller\ExampleController
+command: \bc\exmple\controller\ExampleCommand
 actions:
   startPage:
     url: '/(:page)'
@@ -10,7 +11,7 @@ actions:
     vars:
       page: ':page'
       time: 'new \DateTime()'
-  redirectExamle:
+  redirectExample:
     url: '/redirect/:url'
     params:
       url: []

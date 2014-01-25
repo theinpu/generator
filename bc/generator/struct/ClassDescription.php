@@ -29,7 +29,7 @@ class ClassDescription extends Description {
      * @param $colorize
      * @return string
      */
-    public function export($colorize) {
+    public function export($colorize = false) {
         parent::export($colorize);
         $out = '';
         $out .= $this->insertDoc();

@@ -15,6 +15,7 @@ class ControllerParser extends Parser {
      * @var Action[]
      */
     private $actions = array();
+    private $commandClass = null;
 
     public function __construct($file) {
         parent::__construct($file);
@@ -23,9 +24,23 @@ class ControllerParser extends Parser {
                 $this->actions[$name] = new Action($name, $info);
             }
         }
+        if (isset($this->data['command'])) {
+            $this->commandClass = $this->data['command'];
+            $this->commandNameSpace = $this->getNamespace($this->commandClass);
+        }
     }
 
     public function getActions() {
         return $this->actions;
+    }
+
+    public function getCommandClass() {
+        if (is_null($this->commandClass)) throw new \RuntimeException();
+        return str_replace($this->commandNameSpace . '\\', '', $this->commandClass);
+    }
+
+    public function getCommandNamespace() {
+        if (is_null($this->commandNameSpace)) throw new \RuntimeException();
+        return $this->commandNameSpace;
     }
 }

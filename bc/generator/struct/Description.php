@@ -77,7 +77,6 @@ class Description implements Exportable {
         if (is_array($code)) {
             $this->code = array_merge($this->code, $code);
         } else {
-            var_dump($this->code);
             $this->code[] = $code;
         }
     }

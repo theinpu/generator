@@ -67,20 +67,20 @@ class Parser {
         return $path;
     }
 
-    public function getNamespace() {
-        $name = explode('\\', $this->getFullClass());
+    public function getNamespace($fullName) {
+        $name = explode('\\', $fullName);
         array_pop($name);
         $name = implode('\\', $name);
 
         return $name;
     }
 
-    private function getFullClass() {
+    public function getFullClass() {
         return $this->data['class'];
     }
 
     public function getClass() {
-        return str_replace($this->getNamespace() . '\\', '', $this->getFullClass());
+        return str_replace($this->getNamespace($this->getFullClass()) . '\\', '', $this->getFullClass());
     }
 
     /**
@@ -128,7 +128,7 @@ class Parser {
     }
 
     private function generatePath() {
-        $path = trim($this->getNamespace(), '\\');
+        $path = trim($this->getNamespace($this->getFullClass()), '\\');
         $path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
         return $path;
     }
