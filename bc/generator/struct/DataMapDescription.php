@@ -21,7 +21,7 @@ class DataMapDescription extends ClassDescription {
      * @param Parser $parser
      */
     public function __construct($name, $parser) {
-        parent::__construct($name, $parser->getNamespace() . '\\' . $parser->getPath('dataMap', true));
+        parent::__construct($name, $parser->getNamespace() . $parser->getPath('dataMap', true));
         $this->useDoc();
         $this->parser = $parser;
         $this->modelClass = $parser->getNamespace() . '\\' . $parser->getClass();

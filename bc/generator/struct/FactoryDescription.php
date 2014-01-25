@@ -22,7 +22,7 @@ class FactoryDescription extends ClassDescription {
      */
     public function __construct($parser) {
         $name = $parser->getClass() . 'Factory';
-        $namespace = $parser->getNamespace() . '\\' . $parser->getPath('factory', true);
+        $namespace = $parser->getNamespace() . $parser->getPath('factory', true);
         $this->parser = $parser;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
         $this->setParent('Factory');

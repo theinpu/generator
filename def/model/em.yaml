@@ -12,9 +12,4 @@ fields:
     type: \DateTime
     sqlType: int
     flags: [NN, RO]
-    ref:
-paths:
-  base: model
-  dataMap: dataMaps
-  builder: builder
-  factory: factory
+    ref: getTimestamp

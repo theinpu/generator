@@ -10,8 +10,8 @@ namespace bc\generator;
 use bc\config\ConfigManager;
 use bc\generator\parser\Field;
 
-class Parser
-{
+class Parser {
+    private $savePath;
 
     /**
      * @var array
@@ -23,6 +23,7 @@ class Parser
     private $fields = array();
 
     public function __construct($file) {
+        $this->savePath = ConfigManager::get('config/generator')->get('save.path');
         if (!file_exists($file)) {
             throw new \RuntimeException(sprintf("File %s not found", $file));
         }
@@ -43,18 +44,24 @@ class Parser
      */
     public function getPath($componentName, $return = false) {
         if (!isset($this->data['paths'])) {
-            return null;
+            if ($return) {
+                return '';
+            }
+            return $this->savePath . $this->generatePath();
         }
         if (!isset($this->data['paths'][$componentName])) {
-            return null;
+            $path = $componentName;
+        } else {
+            $path = $this->data['paths'][$componentName];
         }
-        $path = $this->data['paths'][$componentName];
         if (strpos($path, '%same%') !== false) {
             $path = str_replace('%same%', $this->data['paths']['base'], $path);
         }
 
-        if(!$return) {
-            $path = ConfigManager::get('config/generator')->get('save.path') . $path;
+        if (!$return) {
+            $path = $this->savePath . $this->generatePath() . '/' . $path;
+        } elseif (!empty($path)) {
+            $path = '\\' . $path;
         }
 
         return $path;
@@ -117,5 +124,11 @@ class Parser
         foreach ($this->data['fields'] as $field => $info) {
             $this->fields[$field] = new Field($field, $info);
         }
+    }
+
+    private function generatePath() {
+        $path = trim($this->getNamespace(), '\\');
+        $path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
+        return $path;
     }
 }

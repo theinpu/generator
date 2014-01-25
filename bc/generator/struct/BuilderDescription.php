@@ -27,7 +27,7 @@ class BuilderDescription extends ClassDescription {
      */
     public function __construct($parser, $model) {
         $name = $parser->getClass() . 'Builder';
-        $namespace = $parser->getNamespace() . '\\' . $parser->getPath('builder', true);
+        $namespace = $parser->getNamespace() . $parser->getPath('builder', true);
         $this->parser = $parser;
         $this->model = $model;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
