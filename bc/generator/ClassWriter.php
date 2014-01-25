@@ -32,6 +32,9 @@ class ClassWriter {
         if(!empty($namespace)) {
             $out .= 'namespace ' . $namespace . ";\n\n";
         }
+        if ($namespace != 'bc\\model' && strpos($this->class->getName(), 'Factory') !== false) {
+            $this->addUsage('bc\\model\\Factory');
+        }
         $out .= $this->insertUsages();
         $out .= $this->class->export();
 
@@ -57,7 +60,7 @@ class ClassWriter {
             foreach($this->usages as $usage) {
                 $usages[] = 'use ' . ltrim($usage, '\\') . ";";
             }
-            $out .= implode("\n", $usages) . "\n";
+            $out .= implode("\n", $usages) . "\n\n";
 
             return $out;
         }

@@ -25,6 +25,7 @@ class FactoryDescription extends ClassDescription {
         $namespace = $parser->getNamespace();
         $this->parser = $parser;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
+        $this->setParent('Factory');
         parent::__construct($name, $namespace);
         $this->useDoc();
         $doc = new PHPDocDescription();

@@ -1,5 +1,5 @@
-name: ExampleModel
-class: \bc\model\ExampleModel
+name: Model
+class: \bc\example\Model
 parent: \bc\model\Model
 parentDescription: model
 table: example
