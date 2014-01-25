@@ -46,6 +46,7 @@ class Generator {
         }
         foreach ($this->parser->getFields() as $name => $info) {
             $field = new ModelFieldDescription($name);
+            $field->setModifier('private');
             if ($info->hasType()) {
                 $field->setType($info->getType());
             }

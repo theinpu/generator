@@ -48,14 +48,14 @@ class FieldDescription extends Description {
      */
     public function export($colorize) {
         $out = '';
-        if($this->useDoc) {
-            if(!empty($this->type)) {
+        if ($this->useDoc) {
+            if (!empty($this->type)) {
                 $this->getDoc()->addAnnotation('var', $this->type);
             }
             $out .= $this->getDoc()->export($colorize) . "\n";
         }
         $out .= $this->modifier;
-        if($this->isStatic) {
+        if ($this->isStatic) {
             $out .= ' static';
         }
         $out .= ' $' . $this->getName() . ';';
@@ -65,12 +65,12 @@ class FieldDescription extends Description {
 
     public function setUseGetter($name = '') {
         $this->useGetter = true;
-        if(!empty($name)) $this->getter = $name;
+        if (!empty($name)) $this->getter = $name;
     }
 
     public function setUseSetter($name = '') {
         $this->useSetter = true;
-        if(!empty($name)) $this->setter = $name;
+        if (!empty($name)) $this->setter = $name;
     }
 
     public function getter() {
@@ -90,12 +90,12 @@ class FieldDescription extends Description {
     }
 
     public function getSetter() {
-        if(is_null($this->setterMethod)) {
+        if (is_null($this->setterMethod)) {
             $this->setterMethod = new MethodDescription($this->setter);
             $param = new ParamDescription($this->getName());
             $param->setType(is_null($this->type) ? 'mixed' : $this->type);
             $this->setterMethod->addParam($param);
-            $this->setterMethod->setCode('$this->' . $this->getName() . ' = $' . $this->getName() . ';');
+            $this->setterMethod->appendCode('$this->' . $this->getName() . ' = $' . $this->getName() . ';');
         }
 
         return $this->setterMethod;
@@ -105,10 +105,10 @@ class FieldDescription extends Description {
      * @return MethodDescription
      */
     public function getGetter() {
-        if(is_null($this->getterMethod)) {
+        if (is_null($this->getterMethod)) {
             $this->getterMethod = new MethodDescription($this->getter);
             $this->getterMethod->setType(is_null($this->type) ? 'mixed' : $this->type);
-            $this->getterMethod->setCode('return $this->' . $this->getName() . ';');
+            $this->getterMethod->appendCode('return $this->' . $this->getName() . ';');
         }
 
         return $this->getterMethod;

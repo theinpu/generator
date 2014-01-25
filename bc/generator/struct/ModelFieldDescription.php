@@ -41,14 +41,14 @@ class ModelFieldDescription extends FieldDescription {
      * @return string
      */
     private function setterCode() {
-        $code = '';
+        $code = array();
         if ($this->readOnly) {
             $this->setterMethod->addAnnotation('throws', '\RuntimeException');
-            $code .= "if(!is_null(\$this->{$this->getName()}) && !is_null(\$this->getId())) throw new \\RuntimeException('Changing not allowed');\n";
+            $code[] = "if(!is_null(\$this->{$this->getName()}) && !is_null(\$this->getId())) throw new \\RuntimeException('Changing not allowed');";
         }
-        $code .= '$this->' . $this->getName() . ' = $' . $this->getName() . ';';
+        $code[] = '$this->' . $this->getName() . ' = $' . $this->getName() . ';';
         if ($this->useChanged) {
-            $code .= "\n\$this->changed();";
+            $code[] = "\$this->changed();";
 
             return $code;
         }

@@ -97,6 +97,7 @@ class DataMapDescription extends ClassDescription {
 \$this->updateSql = "$updateSql";
 \$this->deleteSql = "$deleteSql";
 CODE;
+        $code = explode("\n", $code);
         $initSql->setCode($code);
 
         $this->addMethod($initSql);
@@ -136,7 +137,7 @@ CODE;
      * @return string
      */
     private function generateBindingCode() {
-        $code = "return array(\n";
+        $code[] = "return array(";
 
         foreach ($this->parser->getFields() as $field => $info) {
             if (is_null($info->getSqlType())) continue;
@@ -144,9 +145,9 @@ CODE;
             if ($info->isRef()) {
                 $getter .= '->' . $info->getRef();
             }
-            $code .= $this->indent("':{$field}' => \$item->{$getter},") . "\n";
+            $code[] = $this->indent("':{$field}' => \$item->{$getter},");
         }
-        $code .= ");";
+        $code[] = ");";
         return $code;
     }
 
@@ -180,9 +181,10 @@ CODE;
         $param->setType($this->modelClass);
         $param->setNameSpace($this->parser->getNamespace());
         $method->addParam($param);
-        $code = implode("\n", $callbacks['before']) . "\n";
-        $code .= 'parent::itemCallback($item);' . "\n";
-        $code .= implode("\n", $callbacks['after']);
+        $code = array();
+        $code = array_merge($code, $callbacks['before']);
+        $code[] = 'parent::itemCallback($item);';
+        $code = array_merge($code, $callbacks['after']);
         $method->setCode($code);
         $this->addMethod($method);
     }
