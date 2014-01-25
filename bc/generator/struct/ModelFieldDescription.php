@@ -13,7 +13,7 @@ class ModelFieldDescription extends FieldDescription {
     private $required = false;
 
     public function getSetter() {
-        if(is_null($this->setterMethod)) {
+        if (is_null($this->setterMethod)) {
             $this->setterMethod = new MethodDescription($this->setter);
             $param = new ParamDescription($this->getName());
             $param->setType(is_null($this->type) ? 'mixed' : $this->type);
@@ -42,12 +42,12 @@ class ModelFieldDescription extends FieldDescription {
      */
     private function setterCode() {
         $code = '';
-        if($this->readOnly) {
-            $this->addAnnotation('throws', '\RuntimeException');
+        if ($this->readOnly) {
+            $this->setterMethod->addAnnotation('throws', '\RuntimeException');
             $code .= "if(!is_null(\$this->{$this->getName()}) && !is_null(\$this->getId())) throw new \\RuntimeException('Changing not allowed');\n";
         }
         $code .= '$this->' . $this->getName() . ' = $' . $this->getName() . ';';
-        if($this->useChanged) {
+        if ($this->useChanged) {
             $code .= "\n\$this->changed();";
 
             return $code;

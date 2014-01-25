@@ -8,7 +8,6 @@ namespace bc\generator\struct;
 
 class ClassDescription extends Description {
 
-    private $name;
     private $namespace;
     /**
      * @var FieldDescription[]
@@ -20,13 +19,8 @@ class ClassDescription extends Description {
     private $methods = array();
     private $parent;
     private $interfaces = array();
-    /**
-     * @var PHPDocDescription
-     */
-    private $doc = null;
 
     public function __construct($name, $namespace = '') {
-        $this->name = $name;
         $this->namespace = $namespace;
         parent::__construct($name);
     }
@@ -38,7 +32,7 @@ class ClassDescription extends Description {
         $out = '';
         $out .= $this->insertDoc();
         $out .= 'class ';
-        $out .= $this->name;
+        $out .= $this->getName();
         if (!is_null($this->parent)) {
             $out .= ' extends ' . $this->parent;
         }
@@ -54,14 +48,24 @@ class ClassDescription extends Description {
         return $out;
     }
 
-    public function useDoc() {
-        $this->useDoc = true;
-    }
+    protected function insertDoc() {
+        $out = '';
+        if ($this->useDoc) {
+            if (is_null($this->getDoc())) {
+                $doc = new PHPDocDescription();
+                $this->getDoc()->setDescription('Class ' . $this->getName());
+                if (!empty($this->namespace)) {
+                    $doc->addAnnotation('package', $this->namespace);
+                }
+            } else {
+                $doc = $this->getDoc();
+                $doc->setDescription('Class ' . $this->getName());
+            }
+            $out .= $doc->export() . "\n";
+        }
 
-    public function setDoc(PHPDocDescription $doc) {
-        $this->doc = $doc;
+        return $out;
     }
-
 
     /**
      * @param FieldDescription $field
@@ -140,7 +144,7 @@ class ClassDescription extends Description {
     }
 
     public function getNameForUsage() {
-        return ltrim($this->namespace, '\\') . '\\' . $this->name;
+        return ltrim($this->namespace, '\\') . '\\' . $this->getName();
     }
 
 }

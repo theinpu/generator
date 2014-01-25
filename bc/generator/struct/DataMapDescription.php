@@ -108,6 +108,7 @@ CODE;
         $insertBindings->setType('array');
         $param = new ParamDescription('item');
         $param->setType($this->modelClass);
+        $param->setNameSpace($this->parser->getNamespace());
         $insertBindings->addParam($param);
         $code = $this->generateBindingCode();
 
@@ -122,7 +123,9 @@ CODE;
         $updateBindings->setType('array');
         $param = new ParamDescription('item');
         $param->setType($this->modelClass);
+        $param->setNameSpace($this->parser->getNamespace());
         $updateBindings->addParam($param);
+
         $code = $this->generateBindingCode();
         $updateBindings->setCode($code);
 
@@ -175,6 +178,7 @@ CODE;
         $method->setModifier('protected');
         $param = new ParamDescription('item');
         $param->setType($this->modelClass);
+        $param->setNameSpace($this->parser->getNamespace());
         $method->addParam($param);
         $code = implode("\n", $callbacks['before']) . "\n";
         $code .= 'parent::itemCallback($item);' . "\n";

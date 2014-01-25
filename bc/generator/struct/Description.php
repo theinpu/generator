@@ -72,6 +72,7 @@ class Description implements Exportable {
     }
 
     public function useDoc() {
+        $this->useDoc = true;
     }
 
     protected function getDoc() {
@@ -85,25 +86,6 @@ class Description implements Exportable {
     protected function insertDoc() {
         $out = '';
         if ($this->useDoc) {
-            if (!is_null($this->description)) {
-                $this->getDoc()->setDescription($this->description);
-            }
-            if (count($this->params) > 0) {
-                foreach ($this->params as $param) {
-                    $value = '';
-                    if (!is_null($param->getType())) {
-                        $value .= $param->getType() . ' ';
-                    }
-                    $value .= '$' . $param->getName();
-                    if (!is_null($param->getDescription())) {
-                        $value .= ' ' . $param->getDescription();
-                    }
-                    $this->getDoc()->addAnnotation('param', $value);
-                }
-            }
-            if (!is_null($this->type)) {
-                $this->getDoc()->addAnnotation('return', $this->type);
-            }
             $out .= $this->getDoc()->export() . "\n";
         }
 
