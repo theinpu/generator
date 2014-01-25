@@ -19,6 +19,7 @@ class ClassDescription extends Description {
     private $methods = array();
     private $parent;
     private $interfaces = array();
+    private $usages = array();
 
     public function __construct($name, $namespace = '') {
         $this->namespace = $namespace;
@@ -152,6 +153,17 @@ class ClassDescription extends Description {
 
     public function getNameForUsage() {
         return ltrim($this->namespace, '\\') . '\\' . $this->getName();
+    }
+
+    /**
+     * @return array
+     */
+    public function getUsages() {
+        return $this->usages;
+    }
+
+    public function addUsage($usage) {
+        $this->usages[] = $usage;
     }
 
 }

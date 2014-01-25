@@ -18,6 +18,7 @@ use bc\generator\struct\TableDescription;
 
 class Generator {
     private $class;
+    private $config;
 
     /**
      * @var Parser
@@ -32,7 +33,8 @@ class Generator {
     public function __construct($class, $toFile = false) {
         $this->class = $class;
         $this->toFile = $toFile;
-        $this->parser = new Parser(ConfigManager::get('config/generator')->get('def.path') . $this->class . '.yaml');
+        $this->config = ConfigManager::get('config/generator');
+        $this->parser = new Parser($this->config->get('def.path') . $this->class . '.yaml');
 
     }
 
@@ -65,12 +67,13 @@ class Generator {
         }
         $this->model = $class;
         if ($this->toFile) {
-            $file = $this->parser->getPath('base') . '/' . $this->parser->getClass() . '.php';
+            $path = $this->parser->generatePath($this->parser->getFullClass());
+            $file = $this->config->get('save.path') . $path['path'] . '/' . $path['file'];
             $writer = new ClassWriter($class, $file);
             if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
-                echo "Saved to {$file}\n";
+                echo "Saved to " . realpath($file) . "\n";
             }
         } else {
             echo $class->export(false);
@@ -94,8 +97,14 @@ class Generator {
         }
         $data = $table->export(false);
         if ($this->toFile) {
-            $file = $this->parser->getPath('base') . '/' . $this->parser->getClass() . '.sql';
-            file_put_contents($file, $data);
+            $path = $this->parser->generatePath($this->parser->getFullClass(), 'sql');
+            $file = $this->config->get('save.path') . $path['path'] . '/' . $path['file'];
+
+            if (file_put_contents($file, $data) > 0) {
+                echo "Saved to " . realpath($file) . "\n";
+            } else {
+                echo "Error: " . print_r(error_get_last(), true) . "\n";
+            }
         } else {
             echo $data;
         }
@@ -104,7 +113,12 @@ class Generator {
     public function generateDataMap() {
         $class = new DataMapDescription($this->parser->getClass() . 'DataMap', $this->parser);
         if ($this->toFile) {
-            $file = $this->parser->getPath('dataMap') . '/' . $this->parser->getClass() . 'DataMap.php';
+            $path = $this->parser->generatePath(
+                $class->getNamespace()
+                . $this->parser->getPath('dataBase')
+                . '/' . $this->parser->getClass() . 'DataMap'
+            );
+            $file = $this->config->get('save.path') . $path['path'] . '/' . $path['file'];
             $writer = new ClassWriter($class, $file);
             if ($class->getNamespace() != $this->model->getNamespace()) {
                 $writer->addUsage($this->model->getNameForUsage());
@@ -112,7 +126,7 @@ class Generator {
             if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
-                echo "Saved to {$file}\n";
+                echo "Saved to " . realpath($file) . "\n";
             }
         } else {
             echo $class->export(false);
@@ -122,7 +136,12 @@ class Generator {
     public function generateFactory() {
         $class = new FactoryDescription($this->parser);
         if ($this->toFile) {
-            $file = $this->parser->getPath('factory') . '/' . $this->parser->getClass() . 'Factory.php';
+            $path = $this->parser->generatePath(
+                $class->getNamespace()
+                . $this->parser->getPath('factory')
+                . '/' . $this->parser->getClass() . 'Factory'
+            );
+            $file = $this->config->get('save.path') . $path['path'] . '/' . $path['file'];
             $writer = new ClassWriter($class, $file);
             if ($class->getNamespace() != $this->model->getNamespace()) {
                 $writer->addUsage($this->model->getNameForUsage());
@@ -130,7 +149,7 @@ class Generator {
             if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
-                echo "Saved to {$file}\n";
+                echo "Saved to " . realpath($file) . "\n";
             }
         } else {
             echo $class->export(false);
@@ -140,7 +159,12 @@ class Generator {
     public function generateBuilder() {
         $class = new BuilderDescription($this->parser, $this->model);
         if ($this->toFile) {
-            $file = $this->parser->getPath('builder') . '/' . $this->parser->getClass() . 'Builder.php';
+            $path = $this->parser->generatePath(
+                $class->getNamespace()
+                . $this->parser->getPath('builder')
+                . '/' . $this->parser->getClass() . 'Builder'
+            );
+            $file = $this->config->get('save.path') . $path['path'] . '/' . $path['file'];
             $writer = new ClassWriter($class, $file);
             if ($class->getNamespace() != $this->model->getNamespace()) {
                 $writer->addUsage($this->model->getNameForUsage());
@@ -148,7 +172,7 @@ class Generator {
             if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
-                echo "Saved to {$file}\n";
+                echo "Saved to " . realpath($file) . "\n";
             }
         } else {
             echo $class->export(false);

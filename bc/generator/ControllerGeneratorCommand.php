@@ -13,32 +13,54 @@ use bc\generator\struct\ClassDescription;
 use bc\generator\struct\MethodDescription;
 use bc\generator\struct\ParamDescription;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ControllerGeneratorCommand extends Command {
 
-    const DefaultNamespace = 'bc\cmf\Controller';
+    const DefaultController = 'Controller';
+    const DefaultNamespace = 'bc\cmf';
     /**
      * @var ControllerParser
      */
     private $parser = null;
+    /**
+     * @var ClassDescription
+     */
+    private $class = null;
+    /**
+     * @var ClassDescription
+     */
+    private $command = null;
 
     protected function configure() {
         $this->setName('ctrl')
             ->setDescription('сгенерить контроллер')
-            ->addOption('command', 'c', InputOption::VALUE_NONE, 'генерить класс комманды');
+            ->addArgument('description', InputArgument::REQUIRED, 'файл с описание контролла')
+            ->addOption('command', 'c', InputOption::VALUE_NONE, 'генерить класс комманды')
+            ->addOption('output', '-o', InputOption::VALUE_NONE, 'сохранять в файлики');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
+        $cfg = ConfigManager::get('config/generator');
         $this->parser = new ControllerParser(
-            ConfigManager::get('config/generator')->get('def.path') . 'ctrl/ec.yaml');
-        $class = $this->generateController();
-        $output->writeln($class->export());
+            $cfg->get('def.path') . $input->getArgument('description') . '.yaml');
+        $this->class = $this->generateController();
+        $save = $input->getOption('output');
+        ob_start();
+        $path = $this->parser->generatePath($this->parser->getNamespace() . '\\' . $this->parser->getClass());
+        $file = $cfg->get('save.path') . $path['path'] . '/' . $path['file'];
+        $this->output($save, $file, $this->class);
+        $output->writeln(ob_get_clean());
         if ($input->getOption('command')) {
-            $command = $this->generateCommand();
-            $output->writeln($command->export());
+            $this->command = $this->generateCommand();
+            ob_start();
+            $path = $this->parser->generatePath($this->parser->getCommandNamespace() . '\\' . $this->parser->getCommandClass());
+            $file = $cfg->get('save.path') . $path['path'] . '/' . $path['file'];
+            $this->output($save, $file, $this->command);
+            $output->writeln(ob_get_clean());
         }
     }
 
@@ -48,8 +70,10 @@ class ControllerGeneratorCommand extends Command {
     private function generateController() {
         $class = new ClassDescription($this->parser->getClass(),
             $this->parser->getNamespace($this->parser->getFullClass()));
-        $class->setParent(is_null($this->parser->getParent())
-            ? self::DefaultNamespace : $this->parser->getParent());
+        if (is_null($this->parser->getParent())) {
+            $class->setParent(self::DefaultController);
+            $class->addUsage(self::DefaultNamespace . '\\' . self::DefaultController);
+        }
         foreach ($this->parser->getActions() as $action) {
             $method = new MethodDescription($action->getName());
             foreach ($action->getParams() as $param) {
@@ -77,6 +101,10 @@ class ControllerGeneratorCommand extends Command {
             $this->parser->getCommandNamespace());
         $command->setParent('Command');
 
+        if ($command->getNamespace() != self::DefaultNamespace) {
+            $command->addUsage(self::DefaultNamespace . '\Command');
+        }
+
         $construct = new MethodDescription('__construct');
         $construct->addParam(new ParamDescription('method'));
         $construct->appendCode('parent::__construct(\'' . $this->parser->getFullClass() . '\', $method);');
@@ -89,6 +117,21 @@ class ControllerGeneratorCommand extends Command {
             $command->addMethod($cmd);
         }
         return $command;
+    }
+
+    /**
+     * @param $save
+     * @param $file
+     * @param ClassDescription $class
+     */
+    protected function output($save, $file, $class) {
+        if ($save) {
+            $writer = new ClassWriter($class, $file);
+            $writer->write();
+            echo $class->getName() . ' saved to ' . realpath($file) . "\n";
+        } else {
+            $this->class->export();
+        }
     }
 
 

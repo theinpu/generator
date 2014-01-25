@@ -40,6 +40,11 @@ class ClassWriter {
             if (strpos($this->class->getName(), 'DataMap') !== false)
                 $this->addUsage('bc\\model\\DataMap');
         }
+        if (count($this->class->getUsages()) > 0) {
+            foreach ($this->class->getUsages() as $usage) {
+                $this->addUsage($usage);
+            }
+        }
         $out .= $this->insertUsages();
         $out .= $this->class->export(false);
 

@@ -1,6 +1,6 @@
 name: ExampleController
 class: \bc\example\controller\ExampleController
-command: \bc\exmple\controller\ExampleCommand
+command: \bc\example\command\ExampleCommand
 actions:
   startPage:
     url: '/(:page)'

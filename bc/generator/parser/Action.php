@@ -67,7 +67,7 @@ class Action {
             $url = str_replace(':' . $param, '\'.$' . $param . '.\'', $url);
         }
         $code = isset($this->redirect['code']) ? ', ' . $this->redirect['code'] : '';
-        return '$this->redirect(\'' . $url . '\'' . $code . ');';
+        return '$this->getSlim()->redirect(\'' . $url . '\'' . $code . ');';
     }
 
     public function hasVars() {
@@ -80,7 +80,7 @@ class Action {
             if (strpos($value, ':', 0) === 0) {
                 $value = str_replace(':', '$', $value);
             }
-            $code[] = '$this->addData(array(\'' . $name . '\' => ' . $value . ');';
+            $code[] = '$this->addData(array(\'' . $name . '\' => ' . $value . '));';
         }
         return $code;
     }
