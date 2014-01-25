@@ -27,7 +27,7 @@ class BuilderDescription extends ClassDescription {
      */
     public function __construct($parser, $model) {
         $name = $parser->getClass() . 'Builder';
-        $namespace = $parser->getNamespace();
+        $namespace = $parser->getNamespace() . '\\' . $parser->getPath('builder', true);
         $this->parser = $parser;
         $this->model = $model;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
@@ -42,7 +42,7 @@ class BuilderDescription extends ClassDescription {
     private function insertFields() {
         foreach($this->parser->getFields() as $name => $info) {
             if($name == 'id') continue;
-            $field = new FieldDescription($name, $info['type']);
+            $field = new FieldDescription($name, $info->getType());
             $field->setUseSetter($name);
             $code = "\nreturn \$this;";
             $field->getSetter()->setType($this->parser->getClass() . 'Builder');
@@ -61,7 +61,7 @@ class BuilderDescription extends ClassDescription {
 
     private function insertBuild() {
         $build = new MethodDescription('build');
-        $build->setType($this->fullClassName);
+        $build->setType($this->getName());
         $code = '';
         /** @var ModelFieldDescription[] $fields */
         $fields = $this->model->getFields();
@@ -79,6 +79,7 @@ class BuilderDescription extends ClassDescription {
         }
         $code .= "return \$item;";
         $build->setCode($code);
+        $build->addAnnotation('throws', '\InvalidArgumentException');
         $this->addMethod($build);
     }
 

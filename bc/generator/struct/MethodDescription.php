@@ -7,23 +7,8 @@
 namespace bc\generator\struct;
 
 
-class MethodDescription implements Exportable {
+class MethodDescription extends Description {
 
-    private $name;
-    private $modifier = 'public';
-    /**
-     * @var ParamDescription[]
-     */
-    private $params = array();
-    private $code = '';
-    private $useDoc = false;
-    private $description;
-    private $type;
-    private $isStatic = false;
-
-    public function __construct($name) {
-        $this->name = $name;
-    }
 
     /**
      * @return string
@@ -35,7 +20,7 @@ class MethodDescription implements Exportable {
         if($this->isStatic) {
             $out .= ' static';
         }
-        $out .= ' function ' . $this->name . '(';
+        $out .= ' function ' . $this->getName() . '(';
         $out .= $this->insertParams();
         $out .= ') {';
         if(!empty($this->code)) {
@@ -79,61 +64,5 @@ class MethodDescription implements Exportable {
         return $out;
     }
 
-    private function insertDoc() {
-        $out = '';
-        if($this->useDoc) {
-            $doc = new PHPDocDescription();
-            if(!is_null($this->description)) {
-                $doc->setDescription($this->description);
-            }
-            if(count($this->params) > 0) {
-                foreach($this->params as $param) {
-                    $value = '';
-                    if(!is_null($param->getType())) {
-                        $value .= $param->getType() . ' ';
-                    }
-                    $value .= '$' . $param->getName();
-                    if(!is_null($param->getDescription())) {
-                        $value .= ' ' . $param->getDescription();
-                    }
-                    $doc->addAnnotation('param', $value);
-                }
-            }
-            if(!is_null($this->type)) {
-                $doc->addAnnotation('return', $this->type);
-            }
-            $out .= $doc->export() . "\n";
-        }
 
-        return $out;
-    }
-
-    /**
-     * @param $description
-     */
-    public function setDescription($description) {
-        $this->description = $description;
-    }
-
-    /**
-     * @param $type
-     */
-    public function setType($type) {
-        $this->type = $type;
-    }
-
-    public function setModifier($modifier) {
-        $this->modifier = $modifier;
-    }
-
-    /**
-     * @param bool $isStatic
-     */
-    public function setStatic($isStatic) {
-        $this->isStatic = $isStatic;
-    }
-
-    public function appendCode($code) {
-        $this->code .= $code;
-    }
 }

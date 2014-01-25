@@ -44,38 +44,23 @@ class Generator {
         }
         foreach($this->parser->getFields() as $name => $info) {
             $field = new ModelFieldDescription($name);
-            if(isset($info['type'])) {
-                $field->setType($info['type']);
+            if ($info->hasType()) {
+                $field->setType($info->getType());
             }
             $field->useDoc();
-            if(isset($info['flags'])) {
-                if(in_array('RO', $info['flags'])) {
-                    $field->setReadOnly();
-                }
-                if(in_array('NN', $info['flags'])) {
+            if ($info->isReadOnly()) {
+                $field->setReadOnly();
+                if ($info->isRequired()) {
                     $field->setRequired();
                 }
             }
-            $getter = '';
-            if(isset($info['get'])) {
-                if(isset($info['get']['name'])) {
-                    $getter = $info['get']['name'];
-                }
-            }
-            $setter = '';
-            if(isset($info['set'])) {
-                if(isset($info['set']['name'])) {
-                    $setter = $info['set']['name'];
-                }
-                if(isset($info['set']['change'])) {
-                    $field->setUseChanged($info['set']['change']);
-                }
-            }
-            if(!isset($info['sqlType'])) {
+
+            $field->setUseChanged($info->useChange());
+            if (!is_null($info->getSqlType())) {
                 $field->setUseChanged(false);
             }
-            $field->setUseGetter($getter);
-            $field->setUseSetter($setter);
+            $field->setUseGetter($info->getter());
+            $field->setUseSetter($info->setter());
             $class->addField($field);
         }
         $this->model = $class;
@@ -97,13 +82,13 @@ class Generator {
         if(!is_null($this->parser->getParentDescription())) {
             $parent = new Parser(ConfigManager::get('config/generator')->get('def.path') . $this->parser->getParentDescription() . '.yaml');
             foreach($parent->getFields() as $field => $info) {
-                if(!isset($info['sqlType'])) continue;
-                $default = isset($info['default']) ? $info['default'] : null;
-                $table->addColumn($field, $info['sqlType'], $info['flags'], $default);
+                if (is_null($info->getSqlType())) continue;
+                $default = $info->getDefault();
+                $table->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
             }
         }
         foreach($this->parser->getFields() as $field => $info) {
-            if(!isset($info['sqlType'])) continue;
+            if (!is_null($info->getSqlType())) continue;
             $default = isset($info['default']) ? $info['default'] : null;
             $table->addColumn($field, $info['sqlType'], $info['flags'], $default);
         }
@@ -136,6 +121,9 @@ class Generator {
         if($this->toFile) {
             $file = $this->parser->getPath('factory') . '/' . $this->parser->getClass() . 'Factory.php';
             $writer = new ClassWriter($class, $file);
+            if ($class->getNamespace() != $this->model->getNamespace()) {
+                $writer->addUsage($this->model->getNameForUsage());
+            }
             if($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
@@ -151,7 +139,9 @@ class Generator {
         if($this->toFile) {
             $file = $this->parser->getPath('builder') . '/' . $this->parser->getClass() . 'Builder.php';
             $writer = new ClassWriter($class, $file);
-            $writer->addUsage($this->model->getNameForUsage());
+            if ($class->getNamespace() != $this->model->getNamespace()) {
+                $writer->addUsage($this->model->getNameForUsage());
+            }
             if($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {

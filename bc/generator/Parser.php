@@ -8,6 +8,7 @@ namespace bc\generator;
 
 
 use bc\config\ConfigManager;
+use bc\generator\parser\Field;
 
 class Parser
 {
@@ -16,6 +17,10 @@ class Parser
      * @var array
      */
     private $data = array();
+    /**
+     * @var Field[]
+     */
+    private $fields = array();
 
     public function __construct($file) {
         if (!file_exists($file)) {
@@ -23,6 +28,7 @@ class Parser
         }
         $parser = new \Symfony\Component\Yaml\Parser();
         $this->data = $parser->parse(file_get_contents($file));
+        $this->parseFields();
     }
 
     public function getRaw() {
@@ -70,8 +76,11 @@ class Parser
         return str_replace($this->getNamespace() . '\\', '', $this->getFullClass());
     }
 
+    /**
+     * @return parser\Field[]
+     */
     public function getFields() {
-        return $this->data['fields'];
+        return $this->fields;
     }
 
     public function getParent() {
@@ -101,6 +110,12 @@ class Parser
             return false;
         }
 
-        return array_search($flag, $this->data['fields'][$field]['flags']) !== false;
+        return in_array($flag, $this->data['fields'][$field]['flags']);
+    }
+
+    private function parseFields() {
+        foreach ($this->data['fields'] as $field => $info) {
+            $this->fields[$field] = new Field($field, $info);
+        }
     }
 }

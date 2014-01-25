@@ -8,8 +8,7 @@ namespace bc\generator\struct;
 
 use bc\generator\Parser;
 
-class DataMapDescription extends ClassDescription
-{
+class DataMapDescription extends ClassDescription {
 
     /**
      * @var Parser
@@ -30,13 +29,14 @@ class DataMapDescription extends ClassDescription
         $this->createInitSql();
         $this->createInsertBindings();
         $this->createUpdateBindings();
+        $this->createItemCallBack();
     }
 
     private function generateInsert() {
         $sql = "INSERT INTO `" . $this->parser->getTable() . "` (";
         $fields = array();
         foreach ($this->parser->getFields() as $name => $info) {
-            if (!isset($info['sqlType'])) continue;
+            if (is_null($info->getSqlType())) continue;
             $fields[] = $name;
         }
         $names = array();
@@ -57,7 +57,7 @@ class DataMapDescription extends ClassDescription
         $sql = "UPDATE " . $this->parser->getTable() . " SET ";
         $fields = array();
         foreach ($this->parser->getFields() as $name => $info) {
-            if (!isset($info['sqlType'])) continue;
+            if (is_null($info->getSqlType())) continue;
             $fields[] = $name;
         }
         $sets = array();
@@ -136,15 +136,10 @@ CODE;
         $code = "return array(\n";
 
         foreach ($this->parser->getFields() as $field => $info) {
-            if (!isset($info['sqlType'])) continue;
-            $getter = 'get' . ucfirst($field) . '()';
-            if (isset($info['get'])) {
-                if (isset($info['get']['name'])) {
-                    $getter = $info['get']['name'] . '()';
-                }
-            }
-            if (isset($info['ref'])) {
-                $getter .= '->' . $info['ref'] . '()';
+            if (is_null($info->getSqlType())) continue;
+            $getter = $info->getter() . '()';
+            if ($info->isRef()) {
+                $getter .= '->' . $info->getRef();
             }
             $code .= "':{$field}' => \$item->{$getter},\n";
         }
@@ -158,6 +153,34 @@ CODE;
             $list[] = '`' . $field . '`';
         }
         return implode(', ', $list);
+    }
+
+    private function createItemCallBack() {
+        $callbacks = array(
+            'before' => array(),
+            'after' => array()
+        );
+        foreach ($this->parser->getFields() as $field) {
+            if ($field->getType() == '\DateTime') {
+                $callback = '$item->' . $field->setter()
+                    . '(\DateTime::createFromFormat(\'U\', $item->' . $field->getter() . "()));";
+                if ($field->isReadOnly()) {
+                    $callbacks['before'][] = $callback;
+                } else {
+                    $callbacks['after'][] = $callback;
+                }
+            }
+        }
+        $method = new MethodDescription('itemCallback');
+        $method->setModifier('protected');
+        $param = new ParamDescription('item');
+        $param->setType($this->modelClass);
+        $method->addParam($param);
+        $code = implode("\n", $callbacks['before']) . "\n";
+        $code .= 'parent::itemCallback($item);' . "\n";
+        $code .= implode("\n", $callbacks['after']);
+        $method->setCode($code);
+        $this->addMethod($method);
     }
 
 } 

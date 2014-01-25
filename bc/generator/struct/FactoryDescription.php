@@ -22,7 +22,7 @@ class FactoryDescription extends ClassDescription {
      */
     public function __construct($parser) {
         $name = $parser->getClass() . 'Factory';
-        $namespace = $parser->getNamespace();
+        $namespace = $parser->getNamespace() . '\\' . $parser->getPath('builder', true);
         $this->parser = $parser;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
         $this->setParent('Factory');
@@ -32,10 +32,10 @@ class FactoryDescription extends ClassDescription {
         if (!is_null($this->getNamespace())) {
             $doc->addAnnotation('package', $this->getNamespace());
         }
-        $doc->addAnnotation('method ', $this->parser->getClass().' get($id)');
-        $doc->addAnnotation('method ', $this->parser->getClass().'[] getAll()');
-        $doc->addAnnotation('method ', $this->parser->getClass().'[] getList($ids)');
-        $doc->addAnnotation('method ', $this->parser->getClass().'[] getPartial($offset, $count)');
+        $doc->addAnnotation('method ', $this->parser->getClass() . ' get($id)');
+        $doc->addAnnotation('method ', $this->parser->getClass() . '[] getAll()');
+        $doc->addAnnotation('method ', $this->parser->getClass() . '[] getList($ids)');
+        $doc->addAnnotation('method ', $this->parser->getClass() . '[] getPartial($offset, $count)');
         $this->setDoc($doc);
     }
 } 

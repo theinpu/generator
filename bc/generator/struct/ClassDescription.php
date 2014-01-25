@@ -6,12 +6,10 @@
 
 namespace bc\generator\struct;
 
-class ClassDescription implements Exportable
-{
+class ClassDescription extends Description {
 
     private $name;
     private $namespace;
-    private $useDoc = false;
     /**
      * @var FieldDescription[]
      */
@@ -30,6 +28,7 @@ class ClassDescription implements Exportable
     public function __construct($name, $namespace = '') {
         $this->name = $name;
         $this->namespace = $namespace;
+        parent::__construct($name);
     }
 
     /**
@@ -63,24 +62,6 @@ class ClassDescription implements Exportable
         $this->doc = $doc;
     }
 
-    private function insertDoc() {
-        $out = '';
-        if ($this->useDoc) {
-            if (is_null($this->doc)) {
-                $doc = new PHPDocDescription();
-                $doc->setDescription('Class ' . $this->name);
-                if (!empty($this->namespace)) {
-                    $doc->addAnnotation('package', $this->namespace);
-                }
-            } else {
-                $doc = $this->doc;
-                $doc->setDescription('Class ' . $this->name);
-            }
-            $out .= $doc->export() . "\n";
-        }
-
-        return $out;
-    }
 
     /**
      * @param FieldDescription $field
@@ -149,10 +130,6 @@ class ClassDescription implements Exportable
 
     public function addInterface($interface) {
         $this->interfaces[] = $interface;
-    }
-
-    public function getName() {
-        return $this->name;
     }
 
     /**

@@ -26,11 +26,11 @@ class ParamDescription implements Exportable {
      */
     public function export() {
         $param = '';
-        if($this->isRef) {
+        if ($this->isRef) {
             $param .= '&';
         }
         $param .= '$' . $this->name;
-        if(!is_null($this->default)) {
+        if (!is_null($this->default)) {
             $param .= ' = ' . (is_string($this->default) ? "'{$this->default}'" : $this->default);
         }
 
@@ -55,6 +55,10 @@ class ParamDescription implements Exportable {
 
     public function setDescription($description) {
         $this->description = $description;
+    }
+
+    public function addAnnotation($name, $value) {
+        // TODO: Implement addAnnotation() method.
     }
 
 }
