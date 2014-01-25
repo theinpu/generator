@@ -144,7 +144,7 @@ CODE;
             if ($info->isRef()) {
                 $getter .= '->' . $info->getRef();
             }
-            $code .= "':{$field}' => \$item->{$getter},\n";
+            $code .= $this->indent("':{$field}' => \$item->{$getter},") . "\n";
         }
         $code .= ");";
         return $code;
