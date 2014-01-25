@@ -16,7 +16,7 @@ class Parser {
     /**
      * @var array
      */
-    private $data = array();
+    protected $data = array();
     /**
      * @var Field[]
      */
@@ -121,6 +121,7 @@ class Parser {
     }
 
     private function parseFields() {
+        if (!isset($this->data['fields'])) return;
         foreach ($this->data['fields'] as $field => $info) {
             $this->fields[$field] = new Field($field, $info);
         }

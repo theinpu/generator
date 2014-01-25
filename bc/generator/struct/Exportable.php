@@ -10,9 +10,10 @@ namespace bc\generator\struct;
 interface Exportable {
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export();
+    public function export($colorize);
 
     public function addAnnotation($name, $value);
 

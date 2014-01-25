@@ -73,7 +73,7 @@ class Generator {
                 echo "Saved to {$file}\n";
             }
         } else {
-            echo $class->export();
+            echo $class->export(false);
         }
     }
 
@@ -92,7 +92,7 @@ class Generator {
             $default = isset($info['default']) ? $info['default'] : null;
             $table->addColumn($field, $info['sqlType'], $info['flags'], $default);
         }
-        $data = $table->export();
+        $data = $table->export(false);
         if ($this->toFile) {
             $file = $this->parser->getPath('base') . '/' . $this->parser->getClass() . '.sql';
             file_put_contents($file, $data);
@@ -115,7 +115,7 @@ class Generator {
                 echo "Saved to {$file}\n";
             }
         } else {
-            echo $class->export();
+            echo $class->export(false);
         }
     }
 
@@ -133,7 +133,7 @@ class Generator {
                 echo "Saved to {$file}\n";
             }
         } else {
-            echo $class->export();
+            echo $class->export(false);
         }
     }
 
@@ -151,7 +151,7 @@ class Generator {
                 echo "Saved to {$file}\n";
             }
         } else {
-            echo $class->export();
+            echo $class->export(false);
         }
     }
 } 

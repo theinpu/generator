@@ -13,9 +13,10 @@ class PHPDocDescription implements Exportable {
     private $annotations = array();
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export() {
+    public function export($colorize) {
         $show = !empty($this->description) || !empty($this->annotations);
         $out = '';
         if ($show) {

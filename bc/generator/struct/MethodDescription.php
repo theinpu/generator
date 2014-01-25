@@ -11,10 +11,11 @@ class MethodDescription extends Description {
 
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export() {
-        $out = '';
+    public function export($colorize) {
+        $out = "\n";
         $out .= $this->insertDoc();
         $out .= $this->modifier;
         if ($this->isStatic) {
@@ -28,7 +29,7 @@ class MethodDescription extends Description {
         }
         $out .= '}';
 
-        return $out;
+        return $out . "\n";
     }
 
     /**
@@ -39,6 +40,9 @@ class MethodDescription extends Description {
     }
 
     public function setCode($code) {
+        if (!is_array($code)) {
+            $code = array($code);
+        }
         $this->code = $code;
     }
 
@@ -50,7 +54,7 @@ class MethodDescription extends Description {
         if (count($this->params) > 0) {
             $params = array();
             foreach ($this->params as $param) {
-                $params[] = $param->export();
+                $params[] = $param->export(false);
             }
             $out .= implode(', ', $params);
 
@@ -85,7 +89,7 @@ class MethodDescription extends Description {
             if (!is_null($this->type)) {
                 $this->getDoc()->addAnnotation('return', $this->type);
             }
-            $out .= $this->getDoc()->export() . "\n";
+            $out .= $this->getDoc()->export(false) . "\n";
         }
 
         return $out;

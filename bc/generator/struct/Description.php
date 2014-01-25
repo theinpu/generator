@@ -14,7 +14,7 @@ class Description implements Exportable {
      * @var ParamDescription[]
      */
     protected $params = array();
-    protected $code = '';
+    protected $code = array();
     protected $useDoc = false;
     protected $description;
     protected $type;
@@ -25,6 +25,7 @@ class Description implements Exportable {
      */
     private $doc;
     private $name;
+    private $colorize = false;
 
     public function __construct($name) {
         $this->name = $name;
@@ -32,9 +33,14 @@ class Description implements Exportable {
     }
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export() {
+    public function export($colorize) {
+        $this->colorize = $colorize;
+        if ($colorize) {
+            return '<fg=red>' . get_class($this) . ' empty</fg>';
+        }
         return '';
     }
 
@@ -68,7 +74,12 @@ class Description implements Exportable {
     }
 
     public function appendCode($code) {
-        $this->code .= $code;
+        if (is_array($code)) {
+            $this->code = array_merge($this->code, $code);
+        } else {
+            var_dump($this->code);
+            $this->code[] = $code;
+        }
     }
 
     public function useDoc() {
@@ -86,7 +97,7 @@ class Description implements Exportable {
     protected function insertDoc() {
         $out = '';
         if ($this->useDoc) {
-            $out .= $this->getDoc()->export() . "\n";
+            $out .= $this->getDoc()->export($this->isColorize()) . "\n";
         }
 
         return $out;
@@ -94,11 +105,19 @@ class Description implements Exportable {
 
     protected function indent($text) {
         if (empty($text)) return $text;
-        $lines = explode("\n", $text);
+        if (is_array($text)) {
+            $lines = $text;
+        } else {
+            $lines = explode("\n", $text);
+        }
         foreach ($lines as &$line) {
             $line = "\t" . $line;
         }
         return implode("\n", $lines);
+    }
+
+    protected function isColorize() {
+        return $this->colorize;
     }
 
 }

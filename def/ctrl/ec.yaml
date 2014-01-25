@@ -1,0 +1,20 @@
+name: ExampleController
+class: \bc\example\controller\ExampleController
+actions:
+  startPage:
+    url: '/(:page)'
+    params:
+      page:
+        default: 1
+    template: startPage
+    vars:
+      page: ':page'
+      time: 'new \DateTime()'
+  redirectExamle:
+    url: '/redirect/:url'
+    params:
+      url: []
+    redirect:
+      url: '/r/:url'
+      code: 302
+      params: [url]
