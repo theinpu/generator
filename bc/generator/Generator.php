@@ -39,50 +39,35 @@ class Generator {
     public function generateModel() {
         $class = new ClassDescription($this->parser->getClass(), $this->parser->getNamespace());
         $class->useDoc();
-        if(!is_null($this->parser->getParent())) {
+        if (!is_null($this->parser->getParent())) {
             $class->setParent($this->parser->getParent());
         }
-        foreach($this->parser->getFields() as $name => $info) {
+        foreach ($this->parser->getFields() as $name => $info) {
             $field = new ModelFieldDescription($name);
-            if(isset($info['type'])) {
-                $field->setType($info['type']);
+            if ($info->hasType()) {
+                $field->setType($info->getType());
             }
             $field->useDoc();
-            if(isset($info['flags'])) {
-                if(in_array('RO', $info['flags'])) {
-                    $field->setReadOnly();
-                }
-                if(in_array('NN', $info['flags'])) {
+            if ($info->isReadOnly()) {
+                $field->setReadOnly();
+                if ($info->isRequired()) {
                     $field->setRequired();
                 }
             }
-            $getter = '';
-            if(isset($info['get'])) {
-                if(isset($info['get']['name'])) {
-                    $getter = $info['get']['name'];
-                }
-            }
-            $setter = '';
-            if(isset($info['set'])) {
-                if(isset($info['set']['name'])) {
-                    $setter = $info['set']['name'];
-                }
-                if(isset($info['set']['change'])) {
-                    $field->setUseChanged($info['set']['change']);
-                }
-            }
-            if(!isset($info['sqlType'])) {
+
+            $field->setUseChanged($info->useChange());
+            if (!is_null($info->getSqlType())) {
                 $field->setUseChanged(false);
             }
-            $field->setUseGetter($getter);
-            $field->setUseSetter($setter);
+            $field->setUseGetter($info->getter());
+            $field->setUseSetter($info->setter());
             $class->addField($field);
         }
         $this->model = $class;
-        if($this->toFile) {
+        if ($this->toFile) {
             $file = $this->parser->getPath('base') . '/' . $this->parser->getClass() . '.php';
             $writer = new ClassWriter($class, $file);
-            if($writer->write() === false) {
+            if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
                 echo "Saved to {$file}\n";
@@ -94,21 +79,21 @@ class Generator {
 
     public function generateTable() {
         $table = new TableDescription($this->parser->getTable());
-        if(!is_null($this->parser->getParentDescription())) {
+        if (!is_null($this->parser->getParentDescription())) {
             $parent = new Parser(ConfigManager::get('config/generator')->get('def.path') . $this->parser->getParentDescription() . '.yaml');
-            foreach($parent->getFields() as $field => $info) {
-                if(!isset($info['sqlType'])) continue;
-                $default = isset($info['default']) ? $info['default'] : null;
-                $table->addColumn($field, $info['sqlType'], $info['flags'], $default);
+            foreach ($parent->getFields() as $field => $info) {
+                if (is_null($info->getSqlType())) continue;
+                $default = $info->getDefault();
+                $table->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
             }
         }
-        foreach($this->parser->getFields() as $field => $info) {
-            if(!isset($info['sqlType'])) continue;
+        foreach ($this->parser->getFields() as $field => $info) {
+            if (!is_null($info->getSqlType())) continue;
             $default = isset($info['default']) ? $info['default'] : null;
             $table->addColumn($field, $info['sqlType'], $info['flags'], $default);
         }
         $data = $table->export();
-        if($this->toFile) {
+        if ($this->toFile) {
             $file = $this->parser->getPath('base') . '/' . $this->parser->getClass() . '.sql';
             file_put_contents($file, $data);
         } else {
@@ -118,10 +103,13 @@ class Generator {
 
     public function generateDataMap() {
         $class = new DataMapDescription($this->parser->getClass() . 'DataMap', $this->parser);
-        if($this->toFile) {
+        if ($this->toFile) {
             $file = $this->parser->getPath('dataMap') . '/' . $this->parser->getClass() . 'DataMap.php';
             $writer = new ClassWriter($class, $file);
-            if($writer->write() === false) {
+            if ($class->getNamespace() != $this->model->getNamespace()) {
+                $writer->addUsage($this->model->getNameForUsage());
+            }
+            if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
                 echo "Saved to {$file}\n";
@@ -133,10 +121,13 @@ class Generator {
 
     public function generateFactory() {
         $class = new FactoryDescription($this->parser);
-        if($this->toFile) {
+        if ($this->toFile) {
             $file = $this->parser->getPath('factory') . '/' . $this->parser->getClass() . 'Factory.php';
             $writer = new ClassWriter($class, $file);
-            if($writer->write() === false) {
+            if ($class->getNamespace() != $this->model->getNamespace()) {
+                $writer->addUsage($this->model->getNameForUsage());
+            }
+            if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
                 echo "Saved to {$file}\n";
@@ -148,11 +139,13 @@ class Generator {
 
     public function generateBuilder() {
         $class = new BuilderDescription($this->parser, $this->model);
-        if($this->toFile) {
+        if ($this->toFile) {
             $file = $this->parser->getPath('builder') . '/' . $this->parser->getClass() . 'Builder.php';
             $writer = new ClassWriter($class, $file);
-            $writer->addUsage($this->model->getNameForUsage());
-            if($writer->write() === false) {
+            if ($class->getNamespace() != $this->model->getNamespace()) {
+                $writer->addUsage($this->model->getNameForUsage());
+            }
+            if ($writer->write() === false) {
                 echo "Error: " . print_r(error_get_last(), true) . "\n";
             } else {
                 echo "Saved to {$file}\n";

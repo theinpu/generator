@@ -7,7 +7,7 @@
 namespace bc\generator\struct;
 
 
-class FieldDescription implements Exportable {
+class FieldDescription extends Description {
 
     /**
      * @var MethodDescription
@@ -21,33 +21,22 @@ class FieldDescription implements Exportable {
     /**
      * @var string
      */
-    protected $name;
-    protected $modifier = 'private';
-    protected $useDoc = false;
     protected $useGetter = false;
     protected $useSetter = false;
     protected $getter;
     protected $setter;
-    protected $isStatic = false;
-    protected $type;
 
     /**
      * @param string $name
      * @param string $type
      */
     function __construct($name, $type = '') {
-        $this->name = $name;
-        $this->type = $type;
+        parent::__construct($name);
+        parent::setType($type);
         $this->getter = 'get' . ucfirst($name);
         $this->setter = 'set' . ucfirst($name);
     }
 
-    /**
-     * @return string
-     */
-    public function getName() {
-        return $this->name;
-    }
 
     public function getModifier() {
         return $this->modifier;
@@ -59,30 +48,18 @@ class FieldDescription implements Exportable {
     public function export() {
         $out = '';
         if($this->useDoc) {
-            $doc = new PHPDocDescription();
             if(!empty($this->type)) {
-                $doc->addAnnotation('var', $this->type);
+                $this->getDoc()->addAnnotation('var', $this->type);
             }
-            $out .= $doc->export() . "\n";
+            $out .= $this->getDoc()->export() . "\n";
         }
         $out .= $this->modifier;
         if($this->isStatic) {
             $out .= ' static';
         }
-        $out .= ' $' . $this->name . ';';
+        $out .= ' $' . $this->getName() . ';';
 
         return $out;
-    }
-
-    /**
-     * @param string $modifier
-     */
-    public function setModifier($modifier) {
-        $this->modifier = $modifier;
-    }
-
-    public function useDoc() {
-        $this->useDoc = true;
     }
 
     public function setUseGetter($name = '') {
@@ -103,10 +80,6 @@ class FieldDescription implements Exportable {
         return $this->setter;
     }
 
-    public function setStatic($isStatic) {
-        $this->isStatic = $isStatic;
-    }
-
     public function isUseGetter() {
         return $this->useGetter;
     }
@@ -118,10 +91,10 @@ class FieldDescription implements Exportable {
     public function getSetter() {
         if(is_null($this->setterMethod)) {
             $this->setterMethod = new MethodDescription($this->setter);
-            $param = new ParamDescription($this->name);
+            $param = new ParamDescription($this->getName());
             $param->setType(is_null($this->type) ? 'mixed' : $this->type);
             $this->setterMethod->addParam($param);
-            $this->setterMethod->setCode('$this->' . $this->name . ' = $' . $this->name . ';');
+            $this->setterMethod->setCode('$this->' . $this->getName() . ' = $' . $this->getName() . ';');
         }
 
         return $this->setterMethod;
@@ -134,18 +107,10 @@ class FieldDescription implements Exportable {
         if(is_null($this->getterMethod)) {
             $this->getterMethod = new MethodDescription($this->getter);
             $this->getterMethod->setType(is_null($this->type) ? 'mixed' : $this->type);
-            $this->getterMethod->setCode('return $this->' . $this->name . ';');
+            $this->getterMethod->setCode('return $this->' . $this->getName() . ';');
         }
 
         return $this->getterMethod;
-    }
-
-    public function setType($type) {
-        $this->type = $type;
-    }
-
-    public function getType() {
-        return $this->type;
     }
 
 }

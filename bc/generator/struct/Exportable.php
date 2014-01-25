@@ -14,4 +14,6 @@ interface Exportable {
      */
     public function export();
 
+    public function addAnnotation($name, $value);
+
 } 

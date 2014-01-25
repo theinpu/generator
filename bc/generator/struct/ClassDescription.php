@@ -6,12 +6,9 @@
 
 namespace bc\generator\struct;
 
-class ClassDescription implements Exportable
-{
+class ClassDescription extends Description {
 
-    private $name;
     private $namespace;
-    private $useDoc = false;
     /**
      * @var FieldDescription[]
      */
@@ -22,14 +19,10 @@ class ClassDescription implements Exportable
     private $methods = array();
     private $parent;
     private $interfaces = array();
-    /**
-     * @var PHPDocDescription
-     */
-    private $doc = null;
 
     public function __construct($name, $namespace = '') {
-        $this->name = $name;
         $this->namespace = $namespace;
+        parent::__construct($name);
     }
 
     /**
@@ -39,7 +32,7 @@ class ClassDescription implements Exportable
         $out = '';
         $out .= $this->insertDoc();
         $out .= 'class ';
-        $out .= $this->name;
+        $out .= $this->getName();
         if (!is_null($this->parent)) {
             $out .= ' extends ' . $this->parent;
         }
@@ -55,26 +48,18 @@ class ClassDescription implements Exportable
         return $out;
     }
 
-    public function useDoc() {
-        $this->useDoc = true;
-    }
-
-    public function setDoc(PHPDocDescription $doc) {
-        $this->doc = $doc;
-    }
-
-    private function insertDoc() {
+    protected function insertDoc() {
         $out = '';
         if ($this->useDoc) {
-            if (is_null($this->doc)) {
+            if (is_null($this->getDoc())) {
                 $doc = new PHPDocDescription();
-                $doc->setDescription('Class ' . $this->name);
+                $this->getDoc()->setDescription('Class ' . $this->getName());
                 if (!empty($this->namespace)) {
                     $doc->addAnnotation('package', $this->namespace);
                 }
             } else {
-                $doc = $this->doc;
-                $doc->setDescription('Class ' . $this->name);
+                $doc = $this->getDoc();
+                $doc->setDescription('Class ' . $this->getName());
             }
             $out .= $doc->export() . "\n";
         }
@@ -151,10 +136,6 @@ class ClassDescription implements Exportable
         $this->interfaces[] = $interface;
     }
 
-    public function getName() {
-        return $this->name;
-    }
-
     /**
      * @return FieldDescription[]
      */
@@ -163,7 +144,7 @@ class ClassDescription implements Exportable
     }
 
     public function getNameForUsage() {
-        return ltrim($this->namespace, '\\') . '\\' . $this->name;
+        return ltrim($this->namespace, '\\') . '\\' . $this->getName();
     }
 
 }

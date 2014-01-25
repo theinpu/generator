@@ -8,8 +8,13 @@ fields:
     type: string
     sqlType: VARCHAR(100)
     flags: [NN]
+  time:
+    type: \DateTime
+    sqlType: int
+    flags: [NN, RO]
+    ref:
 paths:
   base: model
   dataMap: dataMaps
-  builder: '%same%'
-  factory: '%same%'
+  builder: builder
+  factory: factory

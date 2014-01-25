@@ -16,11 +16,14 @@ class PHPDocDescription implements Exportable {
      * @return string
      */
     public function export() {
-        $out = '/**';
-        $out = $this->insertDescription($out);
-        $out = $this->insertAnnotations($out);
-        $out .= "\n */";
-
+        $show = !empty($this->description) || !empty($this->annotations);
+        $out = '';
+        if ($show) {
+            $out = '/**';
+            $out = $this->insertDescription($out);
+            $out = $this->insertAnnotations($out);
+            $out .= "\n */";
+        }
         return $out;
     }
 
@@ -41,8 +44,8 @@ class PHPDocDescription implements Exportable {
      * @return string
      */
     private function insertAnnotations($out) {
-        if(count($this->annotations) > 0) {
-            foreach($this->annotations as $annotation) {
+        if (count($this->annotations) > 0) {
+            foreach ($this->annotations as $annotation) {
                 $out .= "\n * @" . $annotation['name'] . " " . $annotation['value'];
             }
 
@@ -58,7 +61,7 @@ class PHPDocDescription implements Exportable {
      * @return string
      */
     private function insertDescription($out) {
-        if(!empty($this->description)) {
+        if (!empty($this->description)) {
             $out .= "\n * " . $this->description;
 
             return $out;

@@ -32,8 +32,13 @@ class ClassWriter {
         if(!empty($namespace)) {
             $out .= 'namespace ' . $namespace . ";\n\n";
         }
-        if ($namespace != 'bc\\model' && strpos($this->class->getName(), 'Factory') !== false) {
-            $this->addUsage('bc\\model\\Factory');
+        if ($namespace != 'bc\\model') {
+            if (strpos($this->class->getName(), 'Factory') !== false)
+                $this->addUsage('bc\\model\\Factory');
+            if (strpos($this->class->getName(), 'Builder') !== false)
+                $this->addUsage('bc\\model\\IBuilder');
+            if (strpos($this->class->getName(), 'DataMap') !== false)
+                $this->addUsage('bc\\model\\DataMap');
         }
         $out .= $this->insertUsages();
         $out .= $this->class->export();

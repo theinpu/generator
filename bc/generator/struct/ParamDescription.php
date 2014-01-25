@@ -7,16 +7,14 @@
 namespace bc\generator\struct;
 
 
-class ParamDescription implements Exportable {
+class ParamDescription extends Description {
 
-    private $name;
     private $default;
     private $isRef = false;
-    private $type = null;
-    private $description;
+    private $namespace;
 
     function __construct($name, $default = null, $isRef = false) {
-        $this->name = $name;
+        parent::__construct($name);
         $this->default = $default;
         $this->isRef = $isRef;
     }
@@ -26,11 +24,11 @@ class ParamDescription implements Exportable {
      */
     public function export() {
         $param = '';
-        if($this->isRef) {
+        if ($this->isRef) {
             $param .= '&';
         }
-        $param .= '$' . $this->name;
-        if(!is_null($this->default)) {
+        $param .= '$' . $this->getName();
+        if (!is_null($this->default)) {
             $param .= ' = ' . (is_string($this->default) ? "'{$this->default}'" : $this->default);
         }
 
@@ -45,16 +43,16 @@ class ParamDescription implements Exportable {
         return $this->type;
     }
 
-    public function getName() {
-        return $this->name;
-    }
-
     public function getDescription() {
         return $this->description;
     }
 
-    public function setDescription($description) {
-        $this->description = $description;
+    public function getNameSpace() {
+        return $this->namespace;
+    }
+
+    public function setNameSpace($namespace) {
+        $this->namespace = $namespace;
     }
 
 }

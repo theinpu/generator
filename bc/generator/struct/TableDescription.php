@@ -24,7 +24,7 @@ class TableDescription implements Exportable {
      * @return string
      */
     public function export() {
-        if(count($this->columns) == 0) {
+        if (count($this->columns) == 0) {
             throw new \InvalidArgumentException('Need to set one or more columns');
         }
         $out = 'CREATE TABLE `' . $this->table . "` (\n";
@@ -43,7 +43,7 @@ class TableDescription implements Exportable {
             'flags' => $flags,
             'default' => $default
         );
-        if($this->checkFlag('PK', $this->columns[$name])) {
+        if ($this->checkFlag('PK', $this->columns[$name])) {
             $this->addPrimaryKey($name);
         }
     }
@@ -64,10 +64,10 @@ class TableDescription implements Exportable {
      * @return mixed
      */
     private function escapeDefault($info) {
-        if(strtoupper($info['default']) == 'NULL') {
+        if (strtoupper($info['default']) == 'NULL') {
             return $info['default'];
         }
-        if(strpos($info['type'], 'VARCHAR') !== false || strpos($info['type'], 'TEXT') !== false) {
+        if (strpos($info['type'], 'VARCHAR') !== false || strpos($info['type'], 'TEXT') !== false) {
             return "'{$info['default']}'";
         }
 
@@ -83,15 +83,15 @@ class TableDescription implements Exportable {
      */
     private function insertColumns() {
         $columns = '';
-        foreach($this->columns as $column => $info) {
+        foreach ($this->columns as $column => $info) {
             $columns .= "  `{$column}` " . $info['type'];
-            if($this->checkFlag('NN', $info)) {
+            if ($this->checkFlag('NN', $info)) {
                 $columns .= ' NOT NULL';
             }
-            if($this->checkFlag('AI', $info)) {
+            if ($this->checkFlag('AI', $info)) {
                 $columns .= ' AUTO_INCREMENT';
             }
-            if(!is_null($info['default'])) {
+            if (!is_null($info['default'])) {
                 $columns .= ' DEFAULT ' . $this->escapeDefault($info);
             }
             $columns .= ",\n";
@@ -105,12 +105,16 @@ class TableDescription implements Exportable {
      */
     private function insertPrimaryKeys() {
         $pk = '';
-        if(count($this->primaryKeys) > 0) {
+        if (count($this->primaryKeys) > 0) {
             $pk = '  PRIMARY KEY (' . implode(', ', $this->primaryKeys) . ")\n";
 
             return $pk;
         }
 
         return $pk;
+    }
+
+    public function addAnnotation($name, $value) {
+        // TODO: Implement addAnnotation() method.
     }
 }

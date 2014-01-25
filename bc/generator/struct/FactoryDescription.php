@@ -22,20 +22,18 @@ class FactoryDescription extends ClassDescription {
      */
     public function __construct($parser) {
         $name = $parser->getClass() . 'Factory';
-        $namespace = $parser->getNamespace();
+        $namespace = $parser->getNamespace() . '\\' . $parser->getPath('factory', true);
         $this->parser = $parser;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
         $this->setParent('Factory');
         parent::__construct($name, $namespace);
         $this->useDoc();
-        $doc = new PHPDocDescription();
         if (!is_null($this->getNamespace())) {
-            $doc->addAnnotation('package', $this->getNamespace());
+            $this->getDoc()->addAnnotation('package', $this->getNamespace());
         }
-        $doc->addAnnotation('method ', $this->parser->getClass().' get($id)');
-        $doc->addAnnotation('method ', $this->parser->getClass().'[] getAll()');
-        $doc->addAnnotation('method ', $this->parser->getClass().'[] getList($ids)');
-        $doc->addAnnotation('method ', $this->parser->getClass().'[] getPartial($offset, $count)');
-        $this->setDoc($doc);
+        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . ' get($id)');
+        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . '[] getAll()');
+        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . '[] getList($ids)');
+        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . '[] getPartial($offset, $count)');
     }
 } 
