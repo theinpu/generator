@@ -1,5 +1,5 @@
-name: Model
-class: \bc\example\Model
+name: Example
+class: \bc\model\example\Example
 parent: \bc\model\Model
 parentDescription: model
 table: example
@@ -13,3 +13,5 @@ fields:
     sqlType: int
     flags: [NN, RO]
     ref: getTimestamp
+paths:
+  dataMap: ../dataMaps

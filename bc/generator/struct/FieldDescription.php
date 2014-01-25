@@ -43,15 +43,16 @@ class FieldDescription extends Description {
     }
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export() {
+    public function export($colorize) {
         $out = '';
         if($this->useDoc) {
             if(!empty($this->type)) {
                 $this->getDoc()->addAnnotation('var', $this->type);
             }
-            $out .= $this->getDoc()->export() . "\n";
+            $out .= $this->getDoc()->export($colorize) . "\n";
         }
         $out .= $this->modifier;
         if($this->isStatic) {

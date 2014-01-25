@@ -13,11 +13,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GeneratorCommand extends Command {
+class ModelGeneratorCommand extends Command {
 
     protected function configure() {
-        $this->setName('gen')
-            ->addArgument('model', InputArgument::REQUIRED, "класс с моделькой для генерации")
+        $this->setName('model')
+            ->addArgument('modelName', InputArgument::REQUIRED, "класс с моделькой для генерации")
             ->addOption('file', 'o', InputOption::VALUE_NONE, "писать в файл")
             ->addOption('table', 't', InputOption::VALUE_NONE, "генерить табличку")
             ->addOption('dataMap', 'd', InputOption::VALUE_NONE, "генерить датамап")
@@ -36,7 +36,7 @@ class GeneratorCommand extends Command {
         if($input->getOption('all')) {
             $genDataMap = $genFactory = $genBuilder = $genTable = true;
         }
-        $model = $input->getArgument('model');
+        $model = $input->getArgument('modelName');
 
         if($genFactory && !$genDataMap) {
             throw new \RuntimeException("Need to generate DataMap too");

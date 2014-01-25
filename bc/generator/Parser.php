@@ -16,7 +16,7 @@ class Parser {
     /**
      * @var array
      */
-    private $data = array();
+    protected $data = array();
     /**
      * @var Field[]
      */
@@ -39,48 +39,34 @@ class Parser {
     /**
      * @param string $componentName
      *
-     * @param bool $return
      * @return null
      */
-    public function getPath($componentName, $return = false) {
-        if (!isset($this->data['paths'])) {
-            if ($return) {
-                return '';
-            }
-            return $this->savePath . $this->generatePath();
-        }
+    public function getPath($componentName) {
+        if (!isset($this->data['paths']))
+            return '';
         if (!isset($this->data['paths'][$componentName])) {
-            $path = $componentName;
-        } else {
-            $path = $this->data['paths'][$componentName];
+            return '';
         }
-        if (strpos($path, '%same%') !== false) {
-            $path = str_replace('%same%', $this->data['paths']['base'], $path);
-        }
-
-        if (!$return) {
-            $path = $this->savePath . $this->generatePath() . '/' . $path;
-        } elseif (!empty($path)) {
-            $path = '\\' . $path;
-        }
-
-        return $path;
+        return '/' . trim($this->data['paths'][$componentName], '/');
     }
 
-    public function getNamespace() {
-        $name = explode('\\', $this->getFullClass());
+    public function getNamespace($fullName = null) {
+        if (is_null($fullName)) {
+            $fullName = $this->getFullClass();
+        }
+        $name = explode('\\', $fullName);
         array_pop($name);
         $name = implode('\\', $name);
 
         return $name;
     }
 
-    private function getFullClass() {
+    public function getFullClass() {
         return $this->data['class'];
     }
 
     public function getClass() {
-        return str_replace($this->getNamespace() . '\\', '', $this->getFullClass());
+        return str_replace($this->getNamespace($this->getFullClass()) . '\\', '', $this->getFullClass());
     }
 
     /**
@@ -121,14 +107,19 @@ class Parser {
     }
 
     private function parseFields() {
+        if (!isset($this->data['fields'])) return;
         foreach ($this->data['fields'] as $field => $info) {
             $this->fields[$field] = new Field($field, $info);
         }
     }
 
-    private function generatePath() {
-        $path = trim($this->getNamespace(), '\\');
-        $path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
-        return $path;
+    public function generatePath($fullName = null, $ext = 'php') {
+        if (is_null($fullName)) {
+            $fullName = $this->getFullClass();
+        }
+        $pathInfo['path'] = trim($this->getNamespace($fullName), '\\');
+        $pathInfo['path'] = str_replace('\\', DIRECTORY_SEPARATOR, $pathInfo)['path'];
+        $pathInfo['file'] = str_replace($this->getNamespace($fullName) . '\\', '', $fullName) . '.' . $ext;
+        return $pathInfo;
     }
 }

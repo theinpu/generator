@@ -20,9 +20,10 @@ class ParamDescription extends Description {
     }
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export() {
+    public function export($colorize) {
         $param = '';
         if ($this->isRef) {
             $param .= '&';

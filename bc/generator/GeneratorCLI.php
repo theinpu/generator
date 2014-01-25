@@ -12,8 +12,9 @@ use Symfony\Component\Console\Application;
 class GeneratorCLI extends Application {
 
     public function __construct() {
-        parent::__construct('Model generator');
+        parent::__construct('code generator');
 
-        $this->add(new GeneratorCommand());
+        $this->add(new ModelGeneratorCommand());
+        $this->add(new ControllerGeneratorCommand());
     }
 }

@@ -29,7 +29,7 @@ class ClassWriter {
     public function write() {
         $out = "<?php \n\n";
         $namespace = ltrim($this->class->getNamespace(), '\\');
-        if(!empty($namespace)) {
+        if (!empty($namespace)) {
             $out .= 'namespace ' . $namespace . ";\n\n";
         }
         if ($namespace != 'bc\\model') {
@@ -40,11 +40,16 @@ class ClassWriter {
             if (strpos($this->class->getName(), 'DataMap') !== false)
                 $this->addUsage('bc\\model\\DataMap');
         }
+        if (count($this->class->getUsages()) > 0) {
+            foreach ($this->class->getUsages() as $usage) {
+                $this->addUsage($usage);
+            }
+        }
         $out .= $this->insertUsages();
-        $out .= $this->class->export();
+        $out .= $this->class->export(false);
 
         $dir = dirname($this->file);
-        if(!file_exists($dir)) {
+        if (!file_exists($dir)) {
             mkdir($dir, 0775, true);
         }
 
@@ -60,9 +65,9 @@ class ClassWriter {
      */
     private function insertUsages() {
         $out = '';
-        if(count($this->usages) > 0) {
+        if (count($this->usages) > 0) {
             $usages = array();
-            foreach($this->usages as $usage) {
+            foreach ($this->usages as $usage) {
                 $usages[] = 'use ' . ltrim($usage, '\\') . ";";
             }
             $out .= implode("\n", $usages) . "\n\n";

@@ -20,10 +20,11 @@ class TableDescription implements Exportable {
     }
 
     /**
+     * @param $colorize
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function export() {
+    public function export($colorize) {
         if (count($this->columns) == 0) {
             throw new \InvalidArgumentException('Need to set one or more columns');
         }

@@ -19,6 +19,7 @@ class ClassDescription extends Description {
     private $methods = array();
     private $parent;
     private $interfaces = array();
+    private $usages = array();
 
     public function __construct($name, $namespace = '') {
         $this->namespace = $namespace;
@@ -26,9 +27,11 @@ class ClassDescription extends Description {
     }
 
     /**
+     * @param $colorize
      * @return string
      */
-    public function export() {
+    public function export($colorize = false) {
+        parent::export($colorize);
         $out = '';
         $out .= $this->insertDoc();
         $out .= 'class ';
@@ -39,11 +42,15 @@ class ClassDescription extends Description {
         if (count($this->interfaces) > 0) {
             $out .= ' implements ' . implode(', ', $this->interfaces);
         }
-        $out .= ' {';
+        $out .= " {\n";
         $out .= $this->indent($this->insertFields());
         $out .= $this->indent($this->insertMethods());
 
-        $out .= "\n}";
+        $out .= "\n}\n";
+
+        if ($colorize) {
+            $out .= '<fg=yellow>' . $out . '</fg=yellow>';
+        }
 
         return $out;
     }
@@ -61,7 +68,7 @@ class ClassDescription extends Description {
                 $doc = $this->getDoc();
                 $doc->setDescription('Class ' . $this->getName());
             }
-            $out .= $doc->export() . "\n";
+            $out .= $doc->export(false) . "\n";
         }
 
         return $out;
@@ -95,7 +102,7 @@ class ClassDescription extends Description {
                 if ($this->useDoc) {
                     $field->useDoc();
                 }
-                $out .= "\n" . $field->export();
+                $out .= "\n" . $field->export(false);
             }
             $out .= "\n\n//endregion\n";
 
@@ -113,19 +120,20 @@ class ClassDescription extends Description {
      * @return string
      */
     private function insertMethods() {
-        $out = '';
+        $out = array();
         if (count($this->methods) > 0) {
+            $out[] = "";
             foreach ($this->methods as $method) {
                 if ($this->useDoc) {
                     $method->useDoc();
                 }
-                $out .= "\n" . $method->export() . "\n";
+                $out[] = $method->export(false);
             }
 
-            return $out . "\n";
+            return implode("", $out);
         }
 
-        return $out;
+        return '';
     }
 
     public function setParent($parent) {
@@ -145,6 +153,17 @@ class ClassDescription extends Description {
 
     public function getNameForUsage() {
         return ltrim($this->namespace, '\\') . '\\' . $this->getName();
+    }
+
+    /**
+     * @return array
+     */
+    public function getUsages() {
+        return $this->usages;
+    }
+
+    public function addUsage($usage) {
+        $this->usages[] = $usage;
     }
 
 }

@@ -44,7 +44,7 @@ class BuilderDescription extends ClassDescription {
             if($name == 'id') continue;
             $field = new FieldDescription($name, $info->getType());
             $field->setUseSetter($name);
-            $code = "\nreturn \$this;";
+            $code = "return \$this;";
             $field->getSetter()->setType($this->parser->getClass() . 'Builder');
             $field->getSetter()->appendCode($code);
             $this->addField($field);
@@ -55,29 +55,29 @@ class BuilderDescription extends ClassDescription {
         $create = new MethodDescription('create');
         $create->setType($this->getName());
         $create->setStatic(true);
-        $create->setCode('return new self();');
+        $create->appendCode('return new self();');
         $this->addMethod($create);
     }
 
     private function insertBuild() {
         $build = new MethodDescription('build');
         $build->setType($this->getName());
-        $code = '';
+        $code = array();
         /** @var ModelFieldDescription[] $fields */
         $fields = $this->model->getFields();
         foreach($fields as $field) {
             if($field->isRequired()) {
-                $code .= 'if(is_null($this->'.$field->getName().')) {'."\n";
-                $code .= "\tthrow new \\InvalidArgumentException('Need to set ".$field->getName()."');\n";
-                $code .= "}\n";
+                $code[] = 'if(is_null($this->' . $field->getName() . ')) {';
+                $code[] = "\tthrow new \\InvalidArgumentException('Need to set " . $field->getName() . "');";
+                $code[] = "}";
             }
         }
-        $code .= '$item = new ' . $this->parser->getClass() . "();\n";
+        $code[] = '$item = new ' . $this->parser->getClass() . "();";
         foreach($this->model->getFields() as $field) {
             if($field->getName() == 'id') continue;
-            $code .= '$item->' . $field->setter() . '($this->' . $field->getName() . ");\n";
+            $code[] = '$item->' . $field->setter() . '($this->' . $field->getName() . ");";
         }
-        $code .= "return \$item;";
+        $code[] = "return \$item;";
         $build->setCode($code);
         $build->addAnnotation('throws', '\InvalidArgumentException');
         $this->addMethod($build);
