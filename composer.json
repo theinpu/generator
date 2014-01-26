@@ -2,7 +2,7 @@
     "name": "bc/generator",
     "description": "model generator",
     "license": "MIT",
-    "version": "0.1.4.1",
+    "version": "0.1.4.2",
     "homepage": "https://github.com/theinpu/generator",
     "authors": [
         {
