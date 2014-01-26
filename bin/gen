@@ -1,9 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
-chdir(__DIR__.'/..');
+require_once getcwd() . '/../vendor/autoload.php';
 
 $cli = new \bc\generator\GeneratorCLI();
 
