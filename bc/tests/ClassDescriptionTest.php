@@ -88,5 +88,21 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($code, $class->export());
     }
 
+    public function testParent() {
+        $class = new ClassDescription('ChildClass');
+        $class->setParent('ParentClass');
+        $this->assertContains(' extends ParentClass', $class->export(true));
+        $class->setParent('AnotherParentClass');
+        $this->assertContains(' extends AnotherParentClass', $class->export(true));
+    }
+
+    public function testInterfaces() {
+        $class = new ClassDescription('Implement');
+        $class->addInterface('IExportable');
+        $class->addInterface('ArrayAccess');
+
+        $this->assertContains(' implements IExportable, ArrayAccess', $class->export(true));
+    }
+
 }
  

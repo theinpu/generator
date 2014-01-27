@@ -17,6 +17,8 @@ class ClassDescription extends AccessibleDescription {
      * @var Property[]
      */
     private $properties = array();
+    private $parentClass = '';
+    private $interfaces = array();
 
     public function __construct($name = '') {
         parent::__construct($name);
@@ -27,7 +29,16 @@ class ClassDescription extends AccessibleDescription {
         $this->cleanCode();
 
         $this->appendCode($this->getDoc()->export());
-        $this->appendCode('class '.$this->getName().' {');
+
+        $extends = '';
+        if(!empty($this->parentClass)) {
+            $extends = ' extends '.$this->parentClass;
+        }
+        $implements = '';
+        if(count($this->interfaces) > 0) {
+            $implements = ' implements '.implode(', ', $this->interfaces);
+        }
+        $this->appendCode('class '.$this->getName().$extends.$implements.' {');
         if(count($this->properties) > 0) {
             foreach($this->properties as $property) {
                 $this->appendCode($this->indent($property->export()));
@@ -61,6 +72,14 @@ class ClassDescription extends AccessibleDescription {
      */
     public function addProperty(Property $property) {
         $this->properties[$property->getName()] = $property;
+    }
+
+    public function setParent($parentClass) {
+        $this->parentClass = $parentClass;
+    }
+
+    public function addInterface($interface) {
+        $this->interfaces[] = $interface;
     }
 
 } 
