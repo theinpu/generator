@@ -21,8 +21,8 @@ class Property extends AccessibleDescription
     private $useGetter = false;
     private $useSetter = false;
 
-    public function __construct($name = '') {
-        parent::__construct($name);
+    public function __construct($name = '', $useDoc = false) {
+        parent::__construct($name, $useDoc);
         $this->setModifier(Description::_PRIVATE);
     }
 
@@ -38,7 +38,7 @@ class Property extends AccessibleDescription
             $default = ' = ' . $this->getDefault();
         }
         $this->getDoc()->addAnnotation('var', $type . '$' . $this->getName());
-        if (!empty($type)) {
+        if (!empty($type) && $this->useDoc()) {
             $this->appendCode($this->getDoc()->export());
         }
         $this->appendCode($this->getModifier() . ' $' . $this->getName() . $default . ';');
@@ -54,7 +54,7 @@ class Property extends AccessibleDescription
             if (empty($name)) {
                 $name = 'get' . ucfirst($this->getName());
             }
-            $this->getter = new Method($name);
+            $this->getter = new Method($name, $this->useDoc());
             $this->getter->setType($this->getType());
             $this->getter->appendCode('return $this->' . $this->getName() . ';');
         }
@@ -69,7 +69,7 @@ class Property extends AccessibleDescription
             if (empty($name)) {
                 $name = 'set' . ucfirst($this->getName());
             }
-            $this->setter = new Method($name);
+            $this->setter = new Method($name, $this->useDoc());
             $param = new Parameter($this->getName());
             $param->setType($this->getType());
             $this->setter->addParameter($param);

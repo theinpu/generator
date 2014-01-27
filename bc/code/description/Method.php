@@ -7,7 +7,8 @@
 
 namespace bc\code\description;
 
-class Method extends AccessibleDescription {
+class Method extends AccessibleDescription
+{
 
     private $methodCode = array();
 
@@ -25,19 +26,25 @@ class Method extends AccessibleDescription {
         $this->getDoc()->clearAnnotations();
         $params = $this->prepareParams();
         $type = $this->getType();
-        if(!empty($type)) {
+        if (!empty($type)) {
             $this->getDoc()->addAnnotation('return', $type);
         }
-        parent::appendCode($this->getDoc()->export());
+        if ($this->useDoc()) {
+            parent::appendCode($this->getDoc()->export());
+        }
         $types = $this->getTypesString();
-        parent::appendCode($this->getModifier() .$types.' function '.$this->getName().'('. $params .') {');
-        parent::appendCode($this->indent($this->methodCode));
-        parent::appendCode('}');
+        $methodSignature = $this->getModifier() . $types . ' function ' . $this->getName() . '(' . $params . ')';
+        $methodSignature .= $this->isAbstract() ? ';' : ' {';
+        parent::appendCode($methodSignature);
+        if (!$this->isAbstract()) {
+            parent::appendCode($this->indent($this->methodCode));
+            parent::appendCode('}');
+        }
         return parent::export($asText);
     }
 
     public function appendCode($code) {
-        if(!is_array($code)) {
+        if (!is_array($code)) {
             $code = array($code);
         }
         $this->methodCode = array_merge($this->methodCode, $code);
@@ -68,16 +75,16 @@ class Method extends AccessibleDescription {
 
     private function prepareParams() {
         $params = array();
-        if(count($this->params) > 0) {
-            foreach($this->params as $param) {
+        if (count($this->params) > 0) {
+            foreach ($this->params as $param) {
                 $type = $param->getType();
-                if(!empty($type)) $type .= ' ';
+                if (!empty($type)) $type .= ' ';
                 $typeHint = $param->typeHint() ? $type : '';
 
-                $default = $param->hasDefault() ? ' = '.$param->getDefault() : '';
+                $default = $param->hasDefault() ? ' = ' . $param->getDefault() : '';
 
-                $params[] = $typeHint.'$'.$param->getName().$default;
-                $this->getDoc()->addAnnotation('param', $type.'$'.$param->getName());
+                $params[] = $typeHint . '$' . $param->getName() . $default;
+                $this->getDoc()->addAnnotation('param', $type . '$' . $param->getName());
             }
         }
         return implode(', ', $params);

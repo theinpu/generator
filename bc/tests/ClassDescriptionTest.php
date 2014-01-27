@@ -15,7 +15,7 @@ use bc\code\description\Property;
 class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
 
     public function testCreateDefault() {
-        $class = new ClassDescription('Test');
+        $class = new ClassDescription('Test', true);
         $this->assertInstanceOf('bc\\code\\description\\ClassDescription', $class);
 
         $code = array(
@@ -30,8 +30,8 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testWithMethod() {
-        $class = new ClassDescription('MethodTest');
-        $method = new Method('test');
+        $class = new ClassDescription('MethodTest', true);
+        $method = new Method('test', true);
         $method->setDescription('test method');
         $method->appendCode("echo '123';");
         $class->addMethod($method);
@@ -54,7 +54,7 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testWithProperty() {
-        $class = new ClassDescription('PropertyTest');
+        $class = new ClassDescription('PropertyTest', true);
         $property = new Property('field');
         $property->setType('string');
         $property->setUseGetter(true);
@@ -66,19 +66,10 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
             ' * Class PropertyTest',
             ' */',
             'class PropertyTest {',
-            "\t/**",
-            "\t * ".'@var string $field',
-            "\t */",
             "\t".'private $field;',
-            "\t/**",
-            "\t * @return string",
-            "\t */",
             "\t".'public function getField() {',
             "\t\t".'return $this->field;',
             "\t}",
-            "\t/**",
-            "\t * @param string ".'$field',
-            "\t */",
             "\t".'public function setField($field) {',
             "\t\t".'$this->field = $field;',
             "\t}",
@@ -102,6 +93,18 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
         $class->addInterface('ArrayAccess');
 
         $this->assertContains(' implements IExportable, ArrayAccess', $class->export(true));
+    }
+
+    public function testAbstractClass() {
+        $class = new ClassDescription('AbstractClass');
+        $class->setAbstract(true);
+
+        $code = array(
+            'abstract class AbstractClass {',
+            '}'
+        );
+
+        $this->assertEquals($code, $class->export());
     }
 
 }

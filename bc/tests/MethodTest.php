@@ -15,7 +15,7 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
 
 
     public function testCreateDefault() {
-        $method = new Method('testMethod');
+        $method = new Method('testMethod', true);
         $method->appendCode("echo '123';");
         $method->setDescription('test method');
         $method->setType('void');
@@ -58,14 +58,19 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
 
     public function testAbstractStatic() {
         $method = new Method('abstractStatic');
-        $this->assertNotContains(' abstract static ', $method->export(true));
+        $this->assertNotContains(' abstract ', $method->export(true));
+        $this->assertNotContains(' static ', $method->export(true));
         $method->setAbstract(true);
-        $method->setStatic(true);
-        $this->assertContains(' abstract static ', $method->export(true));
+        //$method->setStatic(true);
+        $code = array(
+            'public abstract function abstractStatic();'
+        );
+
+        $this->assertEquals($code, $method->export());
     }
 
     public function testParams() {
-        $method = new Method('params');
+        $method = new Method('params', true);
         /** @var Parameter[] $params */
         $params = array();
         $params[0] = new Parameter('test');

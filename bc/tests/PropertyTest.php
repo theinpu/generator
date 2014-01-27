@@ -14,7 +14,7 @@ use bc\code\description\Property;
 class PropertyTest extends \PHPUnit_Framework_TestCase {
 
     public function testCreate() {
-        $property = new Property('test');
+        $property = new Property('test', true);
         $property->setModifier(Description::_PRIVATE);
         $property->setType('int');
         $property->setDefault(0);
@@ -28,7 +28,7 @@ class PropertyTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetter() {
-        $property = new Property('withGetter');
+        $property = new Property('withGetter', true);
         $property->setModifier(Description::_PRIVATE);
         $property->setType('string');
         $getter = $property->getGetter();
@@ -46,7 +46,7 @@ class PropertyTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetter() {
-        $property = new Property('withSetter');
+        $property = new Property('withSetter', true);
         $property->setModifier(Description::_PRIVATE);
         $property->setType('string');
         $setter = $property->getSetter();

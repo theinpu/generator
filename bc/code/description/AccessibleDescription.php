@@ -24,10 +24,15 @@ class AccessibleDescription extends Description {
      */
     private $doc;
     private $hasDefault = false;
+    /**
+     * @var
+     */
+    private $useDoc = false;
 
-    public function __construct($name = '') {
+    public function __construct($name = '', $useDoc = false) {
         parent::__construct($name);
         $this->doc = new PHPDoc();
+        $this->useDoc = $useDoc;
     }
 
     /**
@@ -101,6 +106,13 @@ class AccessibleDescription extends Description {
 
     protected function getType() {
         return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function useDoc() {
+        return $this->useDoc;
     }
 
 }
