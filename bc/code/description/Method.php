@@ -16,6 +16,8 @@ class Method extends Description {
      * @var PHPDoc
      */
     private $doc;
+    private $abstract = false;
+    private $static = false;
 
     public function __construct($name = '') {
         parent::__construct($name);
@@ -29,7 +31,8 @@ class Method extends Description {
     public function export($asText = false) {
         $this->cleanCode();
         parent::appendCode($this->doc->export());
-        parent::appendCode($this->modifier.' function '.$this->getName().'() {');
+        $types = $this->getTypesString();
+        parent::appendCode($this->modifier.$types.' function '.$this->getName().'() {');
         parent::appendCode($this->indent($this->methodCode));
         parent::appendCode('}');
         return parent::export($asText);
@@ -61,6 +64,29 @@ class Method extends Description {
      */
     public function setModifier($modifier) {
         $this->modifier = $modifier;
+    }
+
+    public function setAbstract($abstract) {
+        $this->abstract = $abstract;
+    }
+
+    public function setStatic($static) {
+        $this->static = $static;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTypesString() {
+        $types = '';
+        if ($this->abstract) {
+            $types .= ' abstract';
+        }
+        if ($this->static) {
+            $types .= ' static';
+            return $types;
+        }
+        return $types;
     }
 
 }
