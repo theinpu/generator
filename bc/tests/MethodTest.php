@@ -74,7 +74,7 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
 
         $code = array(
             '/**',
-            ' * @var Description $test',
+            ' * @param Description $test',
             ' */',
             'public function params(Description $test) {',
             '}'
@@ -88,8 +88,8 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
 
         $code = array(
             '/**',
-            ' * @var Description $test',
-            ' * @var string $def',
+            ' * @param Description $test',
+            ' * @param string $def',
             ' */',
             'public function params(Description $test, $def = \'testing\') {',
             '}'

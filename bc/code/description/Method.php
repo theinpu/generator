@@ -62,7 +62,7 @@ class Method extends AccessibleDescription {
     /**
      * @param Parameter $parameter
      */
-    public function addParameter($parameter) {
+    public function addParameter(Parameter $parameter) {
         $this->params[] = $parameter;
     }
 
@@ -77,7 +77,7 @@ class Method extends AccessibleDescription {
                 $default = $param->hasDefault() ? ' = '.$param->getDefault() : '';
 
                 $params[] = $typeHint.'$'.$param->getName().$default;
-                $this->getDoc()->addAnnotation('var', $type.'$'.$param->getName());
+                $this->getDoc()->addAnnotation('param', $type.'$'.$param->getName());
             }
         }
         return implode(', ', $params);

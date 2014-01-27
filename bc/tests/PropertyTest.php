@@ -53,7 +53,7 @@ class PropertyTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('bc\\code\\description\\Method', $setter);
         $getterCode = array(
             '/**',
-            ' * @var string $withSetter',
+            ' * @param string $withSetter',
             ' */',
             'public function setWithSetter($withSetter) {',
             "\t".'$this->withSetter = $withSetter;',

@@ -18,9 +18,12 @@ class Property extends AccessibleDescription
      * @var Method
      */
     private $setter = null;
+    private $useGetter = false;
+    private $useSetter = false;
 
     public function __construct($name = '') {
         parent::__construct($name);
+        $this->setModifier(Description::_PRIVATE);
     }
 
     public function export($asText = false) {
@@ -35,7 +38,9 @@ class Property extends AccessibleDescription
             $default = ' = ' . $this->getDefault();
         }
         $this->getDoc()->addAnnotation('var', $type . '$' . $this->getName());
-        $this->appendCode($this->getDoc()->export());
+        if (!empty($type)) {
+            $this->appendCode($this->getDoc()->export());
+        }
         $this->appendCode($this->getModifier() . ' $' . $this->getName() . $default . ';');
         return parent::export($asText);
     }
@@ -51,7 +56,7 @@ class Property extends AccessibleDescription
             }
             $this->getter = new Method($name);
             $this->getter->setType($this->getType());
-            $this->getter->appendCode('return $this->'.$this->getName().';');
+            $this->getter->appendCode('return $this->' . $this->getName() . ';');
         }
         return $this->getter;
     }
@@ -60,7 +65,7 @@ class Property extends AccessibleDescription
      * @return Method
      */
     public function getSetter() {
-        if(is_null($this->setter)) {
+        if (is_null($this->setter)) {
             if (empty($name)) {
                 $name = 'set' . ucfirst($this->getName());
             }
@@ -68,9 +73,25 @@ class Property extends AccessibleDescription
             $param = new Parameter($this->getName());
             $param->setType($this->getType());
             $this->setter->addParameter($param);
-            $this->setter->appendCode('$this->'.$this->getName().' = $'.$this->getName().';');
+            $this->setter->appendCode('$this->' . $this->getName() . ' = $' . $this->getName() . ';');
         }
         return $this->setter;
+    }
+
+    public function useGetter() {
+        return $this->useGetter;
+    }
+
+    public function useSetter(){
+        return $this->useSetter;
+    }
+
+    public function setUseGetter($use) {
+        $this->useGetter = $use;
+    }
+
+    public function setUseSetter($use) {
+        $this->useSetter = $use;
     }
 
 }
