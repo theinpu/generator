@@ -7,7 +7,7 @@
 
 namespace bc\code;
 
-interface Exportable {
+interface IExportable {
 
     /**
      * @param bool $asText

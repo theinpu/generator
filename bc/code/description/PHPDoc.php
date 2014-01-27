@@ -39,4 +39,8 @@ class PHPDoc extends Description
         $this->annotations[] = array('key' => $key, 'value' => $value);
     }
 
+    public function clearAnnotations() {
+        $this->annotations = array();
+    }
+
 }

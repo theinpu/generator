@@ -15,7 +15,7 @@ class DescriptionTest extends \PHPUnit_Framework_TestCase {
     public function testCreate() {
         $descr = new DummyDescription('test');
         $this->assertInstanceOf('bc\\code\\description\\Description', $descr);
-        $this->assertInstanceOf('bc\\code\\Exportable', $descr);
+        $this->assertInstanceOf('bc\\code\\IExportable', $descr);
         $this->assertEquals('test', $descr->getName());
     }
 

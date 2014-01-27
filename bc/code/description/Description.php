@@ -8,14 +8,15 @@
 namespace bc\code\description;
 
 
-use bc\code\Exportable;
+use bc\code\IExportable;
 
-abstract class Description implements Exportable
+abstract class Description implements IExportable
 {
 
     const _PUBLIC = 'public';
     const _PRIVATE = 'private';
     const _PROTECTED = 'protected';
+
 
     private $code = array();
     private $name = null;
@@ -51,24 +52,21 @@ abstract class Description implements Exportable
         $this->name = $name;
     }
 
+
     protected function cleanCode() {
         $this->code = array();
     }
 
+    /**
+     * @param array $code
+     * @return array
+     */
     protected final function indent($code) {
-        if (!is_array($code)) {
-            $lines = implode("\n", $code);
-        } else {
-            $lines = $code;
-        }
+        $lines = $code;
         foreach ($lines as &$line) {
             $line = "\t" . $line;
         }
-        if (!is_array($code)) {
-            return implode("\n", $lines);
-        } else {
-            return $lines;
-        }
+        return $lines;
     }
 
 } 

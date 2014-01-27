@@ -7,26 +7,14 @@
 
 namespace bc\code\description;
 
-class Method extends Description {
+class Method extends AccessibleDescription {
 
-    private $modifier = Description::_PUBLIC;
     private $methodCode = array();
 
-    /**
-     * @var PHPDoc
-     */
-    private $doc;
-    private $abstract = false;
-    private $static = false;
     /**
      * @var Parameter[]
      */
     private $params = array();
-
-    public function __construct($name = '') {
-        parent::__construct($name);
-        $this->doc = new PHPDoc();
-    }
 
     /**
      * @param bool $asText
@@ -35,10 +23,9 @@ class Method extends Description {
     public function export($asText = false) {
         $this->cleanCode();
         $params = $this->prepareParams();
-
-        parent::appendCode($this->doc->export());
+        parent::appendCode($this->getDoc()->export());
         $types = $this->getTypesString();
-        parent::appendCode($this->modifier.$types.' function '.$this->getName().'('. $params .') {');
+        parent::appendCode($this->getModifier() .$types.' function '.$this->getName().'('. $params .') {');
         parent::appendCode($this->indent($this->methodCode));
         parent::appendCode('}');
         return parent::export($asText);
@@ -51,44 +38,16 @@ class Method extends Description {
         $this->methodCode = array_merge($this->methodCode, $code);
     }
 
-    /**
-     * @param $description
-     */
-    public function setDescription($description) {
-        $this->doc->setName($description);
-    }
-
-    /**
-     * @return PHPDoc
-     */
-    public function getDoc() {
-        return $this->doc;
-    }
-
-    /**
-     * @param int $modifier
-     */
-    public function setModifier($modifier) {
-        $this->modifier = $modifier;
-    }
-
-    public function setAbstract($abstract) {
-        $this->abstract = $abstract;
-    }
-
-    public function setStatic($static) {
-        $this->static = $static;
-    }
 
     /**
      * @return string
      */
     private function getTypesString() {
         $types = '';
-        if ($this->abstract) {
+        if ($this->isAbstract()) {
             $types .= ' abstract';
         }
-        if ($this->static) {
+        if ($this->isStatic()) {
             $types .= ' static';
             return $types;
         }
@@ -100,6 +59,9 @@ class Method extends Description {
      */
     public function addParameter($parameter) {
         $this->params[] = $parameter;
+        $type = $parameter->getType();
+        if(!empty($type)) $type .= ' ';
+        $this->getDoc()->addAnnotation('var', $type.'$'.$parameter->getName());
     }
 
     private function prepareParams() {
@@ -113,10 +75,10 @@ class Method extends Description {
                 $default = $param->hasDefault() ? ' = '.$param->getDefault() : '';
 
                 $params[] = $typeHint.'$'.$param->getName().$default;
-                $this->getDoc()->addAnnotation('var', $type.'$'.$param->getName());
             }
         }
         return implode(', ', $params);
     }
+
 
 }

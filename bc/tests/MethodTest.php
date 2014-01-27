@@ -71,6 +71,16 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
         $params[0] = new Parameter('test');
         $params[0]->setType('Description', true);
         $method->addParameter($params[0]);
+
+        $code = array(
+            '/**',
+            ' * @var Description $test',
+            ' */',
+            'public function params(Description $test) {',
+            '}'
+        );
+        $this->assertEquals($code, $method->export());
+
         $params[1] = new Parameter('def');
         $params[1]->setType('string');
         $params[1]->setDefault('testing');
