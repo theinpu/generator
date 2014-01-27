@@ -62,5 +62,13 @@ class PropertyTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($getterCode, $setter->export());
     }
+
+    public function testStatic() {
+        $property = new Property('testStatic');
+        $property->setStatic(true);
+
+        $this->assertEquals(array('private static $testStatic;'), $property->export());
+    }
+
 }
  

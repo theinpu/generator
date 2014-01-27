@@ -41,7 +41,11 @@ class Property extends AccessibleDescription
         if (!empty($type) && $this->useDoc()) {
             $this->appendCode($this->getDoc()->export());
         }
-        $this->appendCode($this->getModifier() . ' $' . $this->getName() . $default . ';');
+        $static = '';
+        if($this->isStatic()) {
+            $static = ' static';
+        }
+        $this->appendCode($this->getModifier().$static. ' $' . $this->getName() . $default . ';');
         return parent::export($asText);
     }
 
