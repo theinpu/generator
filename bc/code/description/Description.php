@@ -17,7 +17,7 @@ abstract class Description implements Exportable
     const _PRIVATE = 'private';
     const _PROTECTED = 'protected';
 
-    protected $code = array();
+    private $code = array();
     private $name = null;
 
     public function __construct($name = '') {
@@ -45,6 +45,30 @@ abstract class Description implements Exportable
      */
     public function export($asText = false) {
         return $asText ? implode("\n", $this->getCode()) : $this->getCode();
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    protected function cleanCode() {
+        $this->code = array();
+    }
+
+    protected final function indent($code) {
+        if (!is_array($code)) {
+            $lines = implode("\n", $code);
+        } else {
+            $lines = $code;
+        }
+        foreach ($lines as &$line) {
+            $line = "\t" . $line;
+        }
+        if (!is_array($code)) {
+            return implode("\n", $lines);
+        } else {
+            return $lines;
+        }
     }
 
 } 

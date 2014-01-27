@@ -11,7 +11,7 @@ use bc\code\description\PHPDoc;
 
 class PHPDocTest extends \PHPUnit_Framework_TestCase {
 
-    public function testCreate() {
+    public function testDoc() {
         $phpDoc = new PHPDoc('description');
         $phpDoc->addAnnotation('key', 'value');
 
@@ -22,6 +22,15 @@ class PHPDocTest extends \PHPUnit_Framework_TestCase {
  */
 PHPDOC;
 
+        $this->assertEquals($doc, $phpDoc->export(true));
+
+        $doc = <<<PHPDOC
+/**
+ * test
+ * @key value
+ */
+PHPDOC;
+        $phpDoc->setName('test');
         $this->assertEquals($doc, $phpDoc->export(true));
     }
 

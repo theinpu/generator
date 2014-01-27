@@ -18,14 +18,17 @@ class PHPDoc extends Description
      * @return array|string
      */
     public function export($asText = false) {
+        $this->cleanCode();
         $description = $this->getName();
-        if (!empty($description) && count($this->annotations) > 0) {
+        if (!empty($description) || count($this->annotations) > 0) {
             $this->appendCode("/**");
             if (!empty($description)) {
                 $this->appendCode(' * ' . $description);
             }
-            foreach ($this->annotations as $key => $value) {
-                $this->appendCode(' * @' . $key . ' ' . $value);
+            if (count($this->annotations) > 0) {
+                foreach ($this->annotations as $key => $value) {
+                    $this->appendCode(' * @' . $key . ' ' . $value);
+                }
             }
             $this->appendCode(" */");
         }

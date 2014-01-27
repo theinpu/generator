@@ -13,10 +13,22 @@ class Method extends Description {
     private $methodCode = array();
 
     /**
+     * @var PHPDoc
+     */
+    private $doc;
+
+    public function __construct($name = '') {
+        parent::__construct($name);
+        $this->doc = new PHPDoc();
+    }
+
+    /**
      * @param bool $asText
      * @return array|string
      */
     public function export($asText = false) {
+        $this->cleanCode();
+        parent::appendCode($this->doc->export());
         parent::appendCode($this->modifier.' function '.$this->getName().'() {');
         parent::appendCode($this->indent($this->methodCode));
         parent::appendCode('}');
@@ -30,20 +42,25 @@ class Method extends Description {
         $this->methodCode = array_merge($this->methodCode, $code);
     }
 
-    protected function indent($code) {
-        if(!is_array($code)) {
-            $lines = implode("\n", $code);
-        } else {
-            $lines = $code;
-        }
-        foreach($lines as &$line) {
-            $line = "\t".$line;
-        }
-        if(!is_array($code)) {
-            return implode("\n", $lines);
-        } else {
-            return $lines;
-        }
+    /**
+     * @param $description
+     */
+    public function setDescription($description) {
+        $this->doc->setName($description);
+    }
+
+    /**
+     * @return PHPDoc
+     */
+    public function getDoc() {
+        return $this->doc;
+    }
+
+    /**
+     * @param int $modifier
+     */
+    public function setModifier($modifier) {
+        $this->modifier = $modifier;
     }
 
 }
