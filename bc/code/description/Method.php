@@ -22,7 +22,12 @@ class Method extends AccessibleDescription {
      */
     public function export($asText = false) {
         $this->cleanCode();
+        $this->getDoc()->clearAnnotations();
         $params = $this->prepareParams();
+        $type = $this->getType();
+        if(!empty($type)) {
+            $this->getDoc()->addAnnotation('return', $type);
+        }
         parent::appendCode($this->getDoc()->export());
         $types = $this->getTypesString();
         parent::appendCode($this->getModifier() .$types.' function '.$this->getName().'('. $params .') {');
@@ -59,9 +64,6 @@ class Method extends AccessibleDescription {
      */
     public function addParameter($parameter) {
         $this->params[] = $parameter;
-        $type = $parameter->getType();
-        if(!empty($type)) $type .= ' ';
-        $this->getDoc()->addAnnotation('var', $type.'$'.$parameter->getName());
     }
 
     private function prepareParams() {
@@ -75,6 +77,7 @@ class Method extends AccessibleDescription {
                 $default = $param->hasDefault() ? ' = '.$param->getDefault() : '';
 
                 $params[] = $typeHint.'$'.$param->getName().$default;
+                $this->getDoc()->addAnnotation('var', $type.'$'.$param->getName());
             }
         }
         return implode(', ', $params);

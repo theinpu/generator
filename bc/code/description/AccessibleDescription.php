@@ -40,7 +40,7 @@ class AccessibleDescription extends Description {
     /**
      * @return PHPDoc
      */
-    public function getDoc() {
+    protected function getDoc() {
         return $this->doc;
     }
 

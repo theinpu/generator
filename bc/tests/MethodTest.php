@@ -18,7 +18,7 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
         $method = new Method('testMethod');
         $method->appendCode("echo '123';");
         $method->setDescription('test method');
-        $method->getDoc()->addAnnotation('return','void');
+        $method->setType('void');
 
         $code = array(
             '/**',
