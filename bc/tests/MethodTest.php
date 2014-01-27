@@ -9,6 +9,7 @@ namespace bc\tests;
 
 use bc\code\description\Description;
 use bc\code\description\Method;
+use bc\code\description\Parameter;
 
 class MethodTest extends \PHPUnit_Framework_TestCase {
 
@@ -61,6 +62,29 @@ class MethodTest extends \PHPUnit_Framework_TestCase {
         $method->setAbstract(true);
         $method->setStatic(true);
         $this->assertContains(' abstract static ', $method->export(true));
+    }
+
+    public function testParams() {
+        $method = new Method('params');
+        /** @var Parameter[] $params */
+        $params = array();
+        $params[0] = new Parameter('test');
+        $params[0]->setType('Description', true);
+        $method->addParameter($params[0]);
+        $params[1] = new Parameter('def');
+        $params[1]->setType('string');
+        $params[1]->setDefault('testing');
+        $method->addParameter($params[1]);
+
+        $code = array(
+            '/**',
+            ' * @var Description $test',
+            ' * @var string $def',
+            ' */',
+            'public function params(Description $test, $def = \'testing\') {',
+            '}'
+        );
+        $this->assertEquals($code, $method->export());
     }
 
 }

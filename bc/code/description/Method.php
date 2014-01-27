@@ -18,6 +18,10 @@ class Method extends Description {
     private $doc;
     private $abstract = false;
     private $static = false;
+    /**
+     * @var Parameter[]
+     */
+    private $params = array();
 
     public function __construct($name = '') {
         parent::__construct($name);
@@ -30,9 +34,11 @@ class Method extends Description {
      */
     public function export($asText = false) {
         $this->cleanCode();
+        $params = $this->prepareParams();
+
         parent::appendCode($this->doc->export());
         $types = $this->getTypesString();
-        parent::appendCode($this->modifier.$types.' function '.$this->getName().'() {');
+        parent::appendCode($this->modifier.$types.' function '.$this->getName().'('. $params .') {');
         parent::appendCode($this->indent($this->methodCode));
         parent::appendCode('}');
         return parent::export($asText);
@@ -87,6 +93,30 @@ class Method extends Description {
             return $types;
         }
         return $types;
+    }
+
+    /**
+     * @param Parameter $parameter
+     */
+    public function addParameter($parameter) {
+        $this->params[] = $parameter;
+    }
+
+    private function prepareParams() {
+        $params = array();
+        if(count($this->params) > 0) {
+            foreach($this->params as $param) {
+                $type = $param->getType();
+                if(!empty($type)) $type .= ' ';
+                $typeHint = $param->typeHint() ? $type : '';
+
+                $default = $param->hasDefault() ? ' = '.$param->getDefault() : '';
+
+                $params[] = $typeHint.'$'.$param->getName().$default;
+                $this->getDoc()->addAnnotation('var', $type.'$'.$param->getName());
+            }
+        }
+        return implode(', ', $params);
     }
 
 }

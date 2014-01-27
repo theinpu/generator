@@ -26,8 +26,8 @@ class PHPDoc extends Description
                 $this->appendCode(' * ' . $description);
             }
             if (count($this->annotations) > 0) {
-                foreach ($this->annotations as $key => $value) {
-                    $this->appendCode(' * @' . $key . ' ' . $value);
+                foreach ($this->annotations as $item) {
+                    $this->appendCode(' * @' . $item['key'] . ' ' . $item['value']);
                 }
             }
             $this->appendCode(" */");
@@ -36,7 +36,7 @@ class PHPDoc extends Description
     }
 
     public function addAnnotation($key, $value) {
-        $this->annotations[$key] = $value;
+        $this->annotations[] = array('key' => $key, 'value' => $value);
     }
 
 }
