@@ -14,6 +14,10 @@ class Property extends AccessibleDescription
      * @var Method
      */
     private $getter = null;
+    /**
+     * @var Method
+     */
+    private $setter = null;
 
     public function __construct($name = '') {
         parent::__construct($name);
@@ -50,6 +54,23 @@ class Property extends AccessibleDescription
             $this->getter->appendCode('return $this->'.$this->getName().';');
         }
         return $this->getter;
+    }
+
+    /**
+     * @return Method
+     */
+    public function getSetter() {
+        if(is_null($this->setter)) {
+            if (empty($name)) {
+                $name = 'set' . ucfirst($this->getName());
+            }
+            $this->setter = new Method($name);
+            $param = new Parameter($this->getName());
+            $param->setType($this->getType());
+            $this->setter->addParameter($param);
+            $this->setter->appendCode('$this->'.$this->getName().' = $'.$this->getName().';');
+        }
+        return $this->setter;
     }
 
 }

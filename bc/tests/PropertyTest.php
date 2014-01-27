@@ -44,5 +44,23 @@ class PropertyTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($getterCode, $getter->export());
     }
+
+    public function testSetter() {
+        $property = new Property('withSetter');
+        $property->setModifier(Description::_PRIVATE);
+        $property->setType('string');
+        $setter = $property->getSetter();
+        $this->assertInstanceOf('bc\\code\\description\\Method', $setter);
+        $getterCode = array(
+            '/**',
+            ' * @var string $withSetter',
+            ' */',
+            'public function setWithSetter($withSetter) {',
+            "\t".'$this->withSetter = $withSetter;',
+            '}'
+        );
+
+        $this->assertEquals($getterCode, $setter->export());
+    }
 }
  
