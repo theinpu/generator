@@ -20,6 +20,7 @@ class ClassDescription extends AccessibleDescription
     private $properties = array();
     private $parentClass = '';
     private $interfaces = array();
+    private $namespace = null;
 
     public function __construct($name = '', $useDoc = false) {
         parent::__construct($name, $useDoc);
@@ -48,20 +49,25 @@ class ClassDescription extends AccessibleDescription
 
         $this->appendCode($type.'class ' . $this->getName() . $extends . $implements . ' {');
         if (count($this->properties) > 0) {
+            $this->appendCode('');
             foreach ($this->properties as $property) {
                 $this->appendCode($this->indent($property->export()));
                 if ($property->useGetter()) {
+                    $this->appendCode('');
                     $this->appendCode($this->indent($property->getGetter()->export()));
                 }
                 if ($property->useSetter()) {
+                    $this->appendCode('');
                     $this->appendCode($this->indent($property->getSetter()->export()));
                 }
             }
         }
         if (count($this->methods) > 0) {
+            $this->appendCode('');
             foreach ($this->methods as $method) {
                 $this->appendCode($this->indent($method->export()));
             }
+            $this->appendCode('');
         }
         $this->appendCode('}');
 
@@ -88,6 +94,14 @@ class ClassDescription extends AccessibleDescription
 
     public function addInterface($interface) {
         $this->interfaces[] = $interface;
+    }
+
+    public function setNamespace($namespace) {
+        $this->namespace = $namespace;
+    }
+
+    public function getNamespace() {
+        return $this->namespace;
     }
 
 } 

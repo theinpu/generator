@@ -16,6 +16,7 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
 
     public function testCreateDefault() {
         $class = new ClassDescription('Test', true);
+        $class->setNamespace('bc\\test');
         $this->assertInstanceOf('bc\\code\\description\\ClassDescription', $class);
 
         $code = array(
@@ -27,6 +28,7 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
         );
 
         $this->assertEquals($code, $class->export());
+        $this->assertEquals('bc\\test', $class->getNamespace());
     }
 
     public function testWithMethod() {
@@ -41,12 +43,14 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
             ' * Class MethodTest',
             ' */',
             'class MethodTest {',
+            '',
             "\t/**",
             "\t * test method",
             "\t */",
             "\t".'public function test() {',
             "\t\t"."echo '123';",
             "\t}",
+            '',
             '}'
         );
 
@@ -66,10 +70,13 @@ class ClassDescriptionTest extends \PHPUnit_Framework_TestCase {
             ' * Class PropertyTest',
             ' */',
             'class PropertyTest {',
+            '',
             "\t".'private $field;',
+            '',
             "\t".'public function getField() {',
             "\t\t".'return $this->field;',
             "\t}",
+            '',
             "\t".'public function setField($field) {',
             "\t\t".'$this->field = $field;',
             "\t}",
