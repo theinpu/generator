@@ -112,7 +112,6 @@ class ControllerGeneratorCommand extends Command {
 
         foreach ($this->parser->getActions() as $action) {
             $cmd = new MethodDescription($action->getName());
-            $cmd->setStatic(true);
             $cmd->setType($this->parser->getCommandClass());
             $cmd->appendCode('return new self(\'' . $action->getName() . '\');');
             $command->addMethod($cmd);

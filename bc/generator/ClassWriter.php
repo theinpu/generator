@@ -28,7 +28,7 @@ class ClassWriter {
 
     public function write() {
         $out = "<?php \n\n";
-        $namespace = ltrim($this->class->getNamespace(), '\\');
+        $namespace = trim($this->class->getNamespace(), '\\');
         if (!empty($namespace)) {
             $out .= 'namespace ' . $namespace . ";\n\n";
         }

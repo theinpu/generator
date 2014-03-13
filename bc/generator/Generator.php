@@ -92,9 +92,9 @@ class Generator {
             }
         }
         foreach ($this->parser->getFields() as $field => $info) {
-            if (!is_null($info->getSqlType())) continue;
-            $default = isset($info['default']) ? $info['default'] : null;
-            $table->addColumn($field, $info['sqlType'], $info['flags'], $default);
+            if (is_null($info->getSqlType())) continue;
+            $default = $info->getDefault();
+            $table->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
         }
         $data = $table->export(false);
         if ($this->toFile) {

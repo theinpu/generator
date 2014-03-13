@@ -43,6 +43,7 @@ class BuilderDescription extends ClassDescription {
         foreach($this->parser->getFields() as $name => $info) {
             if($name == 'id') continue;
             $field = new FieldDescription($name, $info->getType());
+            $field->setModifier('private');
             $field->setUseSetter($name);
             $code = "return \$this;";
             $field->getSetter()->setType($this->parser->getClass() . 'Builder');
