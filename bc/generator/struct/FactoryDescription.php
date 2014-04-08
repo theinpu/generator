@@ -31,9 +31,9 @@ class FactoryDescription extends ClassDescription {
         if (!is_null($this->getNamespace())) {
             $this->getDoc()->addAnnotation('package', $this->getNamespace());
         }
-        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . ' get($id)');
-        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . '[] getAll()');
-        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . '[] getList($ids)');
-        $this->getDoc()->addAnnotation('method ', $this->parser->getClass() . '[] getPartial($offset, $count)');
+        $this->getDoc()->addAnnotation('method', $this->parser->getClass() . ' get($id)');
+        $this->getDoc()->addAnnotation('method', $this->parser->getClass() . '[] getAll()');
+        $this->getDoc()->addAnnotation('method', $this->parser->getClass() . '[] getList($ids)');
+        $this->getDoc()->addAnnotation('method', $this->parser->getClass() . '[] getPartial($offset, $count)');
     }
 } 

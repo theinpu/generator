@@ -62,7 +62,7 @@ class BuilderDescription extends ClassDescription {
 
     private function insertBuild() {
         $build = new MethodDescription('build');
-        $build->setType($this->getName());
+        $build->setType($this->parser->getClass());
         $code = array();
         /** @var ModelFieldDescription[] $fields */
         $fields = $this->model->getFields();

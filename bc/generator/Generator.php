@@ -59,7 +59,7 @@ class Generator {
             }
 
             $field->setUseChanged($info->useChange());
-            if (!is_null($info->getSqlType())) {
+            if (is_null($info->getSqlType())) {
                 $field->setUseChanged(false);
             }
             $field->setUseGetter($info->getter());
