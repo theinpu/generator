@@ -16,6 +16,10 @@ class ControllerParser extends Parser {
      */
     private $actions = array();
     private $commandClass = null;
+    private $commandNameSpace = null;
+    private $routerClass = null;
+    private $routerNamespace = null;
+    private $baseUrl = '/';
 
     public function __construct($file) {
         parent::__construct($file);
@@ -27,6 +31,13 @@ class ControllerParser extends Parser {
         if (isset($this->data['command'])) {
             $this->commandClass = $this->data['command'];
             $this->commandNameSpace = $this->getNamespace($this->commandClass);
+        }
+        if(isset($this->data['router'])) {
+            $this->routerClass = $this->data['router'];
+            $this->routerNamespace = $this->getNamespace($this->routerClass);
+        }
+        if(isset($this->data['baseUrl'])) {
+            $this->baseUrl = $this->data['baseUrl'];
         }
     }
 
@@ -42,5 +53,20 @@ class ControllerParser extends Parser {
     public function getCommandNamespace() {
         if (is_null($this->commandNameSpace)) throw new \RuntimeException();
         return $this->commandNameSpace;
+    }
+
+    public function getRouterNamespace() {
+        if(is_null($this->routerNamespace)) throw new \RuntimeException();
+        return $this->routerNamespace;
+    }
+
+    public function getRouterClass() {
+        if (is_null($this->routerClass)) throw new \RuntimeException();
+        return str_replace($this->routerNamespace . '\\', '', $this->routerClass);
+    }
+
+    public function getBaseUrl() {
+        if(is_null($this->baseUrl)) throw new \RuntimeException();
+        return $this->baseUrl;
     }
 }

@@ -1,21 +1,30 @@
 name: ExampleController
 class: \bc\example\controller\ExampleController
 command: \bc\example\command\ExampleCommand
+router: \bc\example\ExampleRouter
+baseUrl: '/example'
 actions:
   startPage:
     url: '/(:page)'
     params:
       page:
         default: 1
-    template: startPage
+    template:
+      name: 'startPage'
+      vars:
+        page: ':page'
+        time: ':time'
     vars:
-      page: ':page'
       time: 'new \DateTime()'
   redirectExample:
     url: '/redirect/:url'
+    todo: 'simple todo'
     params:
       url: []
     redirect:
       url: '/r/:url'
       code: 302
       params: [url]
+  methodExample:
+    url: '/methods'
+    methods: [get, post]
