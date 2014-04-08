@@ -78,15 +78,15 @@ class ControllerGeneratorCommand extends Command {
             $method = new MethodDescription($action->getName());
             foreach ($action->getParams() as $param) {
                 $method->addParam($param);
-                if ($action->hasVars()) {
-                    $method->appendCode($action->getVarsCode());
-                }
-                if ($action->hasTemplate()) {
-                    $method->appendCode($action->getTemplateCode());
-                }
-                if ($action->hasRedirect()) {
-                    $method->appendCode($action->getRedirectCode());
-                }
+            }
+            if ($action->hasVars()) {
+                $method->appendCode($action->getVarsCode());
+            }
+            if ($action->hasTemplate()) {
+                $method->appendCode($action->getTemplateCode());
+            }
+            if ($action->hasRedirect()) {
+                $method->appendCode($action->getRedirectCode());
             }
             $class->addMethod($method);
         }
