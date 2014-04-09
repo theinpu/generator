@@ -52,7 +52,7 @@ class ControllerGeneratorCommand extends Command {
     protected function execute(InputInterface $input, OutputInterface $output) {
         $cfg = ConfigManager::get('config/generator');
         $this->parser = new ControllerParser(
-            $cfg->get('def.path').$input->getArgument('description').'.yaml');
+            $cfg->get('def.path').$input->getArgument('description'));
         $this->class = $this->generateController();
         $save = $input->getOption('output');
         ob_start();

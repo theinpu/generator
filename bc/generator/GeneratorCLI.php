@@ -16,5 +16,6 @@ class GeneratorCLI extends Application {
 
         $this->add(new ModelGeneratorCommand());
         $this->add(new ControllerGeneratorCommand());
+        $this->add(new BatchCommand());
     }
 }

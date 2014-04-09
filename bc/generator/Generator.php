@@ -34,7 +34,7 @@ class Generator {
         $this->class = $class;
         $this->toFile = $toFile;
         $this->config = ConfigManager::get('config/generator');
-        $this->parser = new Parser($this->config->get('def.path') . $this->class . '.yaml');
+        $this->parser = new Parser($this->config->get('def.path') . $this->class);
 
     }
 
