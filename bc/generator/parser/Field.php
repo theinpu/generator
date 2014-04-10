@@ -88,7 +88,7 @@ class Field {
     }
 
     public function isRequired() {
-        return $this->isReadOnly() && in_array('NN', $this->flags);
+        return in_array('NN', $this->flags);
     }
 
     public function getDefault() {
