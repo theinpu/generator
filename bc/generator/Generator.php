@@ -53,9 +53,9 @@ class Generator {
             $field->useDoc();
             if ($info->isReadOnly()) {
                 $field->setReadOnly();
-                if ($info->isRequired()) {
-                    $field->setRequired();
-                }
+            }
+            if ($info->isRequired()) {
+                $field->setRequired();
             }
 
             $field->setUseChanged($info->useChange());
