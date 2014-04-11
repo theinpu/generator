@@ -74,11 +74,14 @@ class Generator {
         }
         if($this->genJSON) {
             $class->addInterface('JSONExport');
-            $export = new MethodDescription('getJSON');
-            $export->setType('string');
-            $export->appendCode("return json_encode(array(\n".implode(",\n", $fields)."\n));");
-
-            $class->addMethod($export);
+            $arrayExport = new MethodDescription('getArray');
+            $arrayExport->setType('array');
+            $arrayExport->appendCode("return array(\n".implode(",\n", $fields)."\n);");
+            $class->addMethod($arrayExport);
+            $jsonExport = new MethodDescription('getJSON');
+            $jsonExport->setType('string');
+            $jsonExport->appendCode("return json_encode(\$this->getArray());");
+            $class->addMethod($jsonExport);
         }
         $this->model = $class;
         if($this->toFile) {
