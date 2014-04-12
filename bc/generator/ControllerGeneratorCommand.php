@@ -46,7 +46,8 @@ class ControllerGeneratorCommand extends Command {
              ->addArgument('description', InputArgument::REQUIRED, 'файл с описание контролла')
              ->addOption('command', 'c', InputOption::VALUE_NONE, 'генерить класс комманды')
              ->addOption('routes', 'r', InputOption::VALUE_NONE, 'генерить биндинг маршрутов')
-             ->addOption('output', '-o', InputOption::VALUE_NONE, 'сохранять в файлики');
+             ->addOption('output', 'o', InputOption::VALUE_NONE, 'сохранять в файлики')
+             ->addOption('all', 'a', InputOption::VALUE_NONE, 'генерим всё');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
@@ -60,7 +61,14 @@ class ControllerGeneratorCommand extends Command {
         $file = $cfg->get('save.path').$path['path'].'/'.$path['file'];
         $this->output($save, $file, $this->class);
         $output->writeln(ob_get_clean());
-        if($input->getOption('command')) {
+        if($input->getOption('all')) {
+            $generateCommand = $generateRoutes = true;
+        }
+        else {
+            $generateCommand = $input->getOption('command');
+            $generateRoutes = $input->getOption('routes');
+        }
+        if($generateCommand) {
             $this->command = $this->generateCommand();
             ob_start();
             $path = $this->parser->generatePath($this->parser->getCommandNamespace().'\\'.$this->parser->getCommandClass());
@@ -68,7 +76,7 @@ class ControllerGeneratorCommand extends Command {
             $this->output($save, $file, $this->command);
             $output->writeln(ob_get_clean());
         }
-        if($input->getOption('routes')) {
+        if($generateRoutes) {
             $this->routes = $this->generateRoutes();
             ob_start();
             $path = $this->parser->generatePath($this->parser->getRouterNamespace().'\\'.$this->parser->getRouterClass());
@@ -163,7 +171,7 @@ class ControllerGeneratorCommand extends Command {
     private function generateRoutes() {
         $router = new ClassDescription($this->parser->getRouterClass(),
                                        $this->parser->getRouterNamespace());
-        $router->setParent('RouterGroup');
+        $router->setParent('RouteGroup');
 
         $baseUrl = $this->parser->getBaseUrl();
 
