@@ -23,13 +23,19 @@ class Parser {
      */
     private $fields = array();
 
-    public function __construct($file) {
+    public function __construct($data) {
         $this->savePath = ConfigManager::get('config/generator')->get('save.path');
-        if(!file_exists($file)) {
-            throw new \RuntimeException(sprintf("File %s not found", $file));
+        if(is_array($data)) {
+            $this->data = $data;
         }
-        $parser = new \Symfony\Component\Yaml\Parser();
-        $this->data = $parser->parse(file_get_contents($file));
+        else {
+            $file = $data;
+            if(!file_exists($file)) {
+                throw new \RuntimeException(sprintf("File %s not found", $file));
+            }
+            $parser = new \Symfony\Component\Yaml\Parser();
+            $this->data = $parser->parse(file_get_contents($file));
+        }
         $this->parseFields();
     }
 
@@ -129,5 +135,9 @@ class Parser {
 
     public function isAbstract() {
         return isset($this->data['abstract']) ? $this->data['abstract'] : false;
+    }
+
+    public function getSavePath() {
+        return $this->savePath;
     }
 }

@@ -8,11 +8,11 @@
 namespace bc\generator;
 
 use bc\config\ConfigManager;
+use bc\generator\struct\TableDescription;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Parser;
 
 class BatchCommand extends Command {
 
@@ -63,14 +63,39 @@ class BatchCommand extends Command {
                 echo $out;
             }
             $table = $model['data']['table'];
-            if($sql && !in_array($table, $tables)) {
-                $tables[] = $table;
+            if($sql && !isset($tables[$table])) {
+                $tables[$table] = $model['data'];
             }
         }
 
         if($sql) {
-            $output->writeln('Generating sql..');
-            //var_dump($tables);
+            $output->writeln('Generating sql ('.count($tables).')..');
+            foreach($tables as $table => $model) {
+                $parser = new Parser($model);
+                $item = new TableDescription($table);
+
+                if(!is_null($parser->getParentDescription())) {
+                    $parent = new Parser(ConfigManager::get('config/generator')
+                                                      ->get('def.path').$parser->getParentDescription());
+                    foreach($parent->getFields() as $field => $info) {
+                        if(is_null($info->getSqlType())) continue;
+                        $default = $info->getDefault();
+                        $item->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
+                    }
+                }
+                foreach($parser->getFields() as $field => $info) {
+                    if(is_null($info->getSqlType())) continue;
+                    $default = $info->getDefault();
+                    $item->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
+                }
+                $file = $parser->getSavePath().'sql/'.$table.'.sql';
+                $path = dirname($file);
+                if(!file_exists($path)) {
+                    mkdir($path);
+                }
+                //var_dump($file);
+                file_put_contents($file, $item->export(false));
+            }
         }
 
         if($container) {
@@ -105,7 +130,7 @@ class BatchCommand extends Command {
 
     private function getControllers($items) {
         $controllers = array();
-        $parser = new Parser();
+        $parser = new \Symfony\Component\Yaml\Parser();
         foreach($items as $item) {
             $data = $parser->parse(file_get_contents($item));
             if(isset($data['actions'])) {
@@ -118,7 +143,7 @@ class BatchCommand extends Command {
 
     private function getModels($items) {
         $models = array();
-        $parser = new Parser();
+        $parser = new \Symfony\Component\Yaml\Parser();
         foreach($items as $item) {
             $data = $parser->parse(file_get_contents($item));
             if(isset($data['fields'])) {
