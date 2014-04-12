@@ -31,7 +31,7 @@ class BuilderDescription extends ClassDescription {
         $this->parser = $parser;
         $this->model = $model;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
-        parent::__construct($name, $namespace);
+        parent::__construct($name, $parser , $namespace);
         $this->addInterface('IBuilder');
         $this->useDoc();
         $this->insertFields();

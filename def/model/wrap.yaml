@@ -1,0 +1,12 @@
+name: WrapExample
+class: \bc\model\example\WrapExample
+parent: \bc\model\example\Example
+parentDescription: 'model/em.yaml'
+table: wrap_example
+fields:
+  content:
+    type: string
+    sqlType: TEXT
+    flags: [NN]
+paths:
+  dataMap: ../dataMaps

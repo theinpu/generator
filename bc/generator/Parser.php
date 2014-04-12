@@ -88,7 +88,7 @@ class Parser {
     }
 
     public function getTable() {
-        return $this->data['table'];
+        return isset($this->data['table']) ? $this->data['table'] : null;
     }
 
     public function getParentDescription() {
@@ -121,7 +121,7 @@ class Parser {
             $fullName = $this->getFullClass();
         }
         $pathInfo['path'] = trim($this->getNamespace($fullName), '\\');
-        $pathInfo['path'] = str_replace('\\', DIRECTORY_SEPARATOR, $pathInfo)['path'];
+        $pathInfo['path'] = str_replace('\\', DIRECTORY_SEPARATOR, $pathInfo['path']);
         $pathInfo['file'] = str_replace($this->getNamespace($fullName).'\\', '', $fullName).'.'.$ext;
 
         return $pathInfo;

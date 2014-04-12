@@ -26,7 +26,7 @@ class FactoryDescription extends ClassDescription {
         $this->parser = $parser;
         $this->fullClassName = $this->parser->getNamespace() . '\\' . $this->parser->getClass();
         $this->setParent('Factory');
-        parent::__construct($name, $namespace);
+        parent::__construct($name, $parser , $namespace);
         $this->useDoc();
         if (!is_null($this->getNamespace())) {
             $this->getDoc()->addAnnotation('package', $this->getNamespace());

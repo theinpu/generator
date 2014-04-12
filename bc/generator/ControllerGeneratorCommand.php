@@ -10,7 +10,6 @@ namespace bc\generator;
 
 use bc\config\ConfigManager;
 use bc\generator\struct\ClassDescription;
-use bc\generator\struct\FieldDescription;
 use bc\generator\struct\MethodDescription;
 use bc\generator\struct\ParamDescription;
 use Symfony\Component\Console\Command\Command;
@@ -90,8 +89,7 @@ class ControllerGeneratorCommand extends Command {
      * @return ClassDescription
      */
     private function generateController() {
-        $class = new ClassDescription($this->parser->getClass(),
-                                      $this->parser->getNamespace($this->parser->getFullClass()));
+        $class = new ClassDescription($this->parser->getClass(), $this->parser , $this->parser->getNamespace($this->parser->getFullClass()));
         if(is_null($this->parser->getParent())) {
             $class->setParent(self::DefaultController);
             $class->addUsage(self::DefaultNamespace.'\\'.self::DefaultController);
@@ -124,8 +122,7 @@ class ControllerGeneratorCommand extends Command {
      * @return ClassDescription
      */
     private function generateCommand() {
-        $command = new ClassDescription($this->parser->getCommandClass(),
-                                        $this->parser->getCommandNamespace());
+        $command = new ClassDescription($this->parser->getCommandClass(), $this->parser , $this->parser->getCommandNamespace());
         $command->setParent('Command');
 
         if($command->getNamespace() != self::DefaultNamespace) {
@@ -169,8 +166,7 @@ class ControllerGeneratorCommand extends Command {
      * @throws \RuntimeException
      */
     private function generateRoutes() {
-        $router = new ClassDescription($this->parser->getRouterClass(),
-                                       $this->parser->getRouterNamespace());
+        $router = new ClassDescription($this->parser->getRouterClass(), $this->parser , $this->parser->getRouterNamespace());
         $router->setParent('RouteGroup');
 
         $baseUrl = $this->parser->getBaseUrl();

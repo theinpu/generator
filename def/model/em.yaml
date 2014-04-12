@@ -1,7 +1,7 @@
 name: Example
 class: \bc\model\example\Example
 parent: \bc\model\Model
-parentDescription: model
+parentDescription: model.yaml
 table: example
 abstract: true
 fields:

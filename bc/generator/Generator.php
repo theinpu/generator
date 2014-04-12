@@ -42,7 +42,7 @@ class Generator {
     }
 
     public function generateModel() {
-        $class = new ClassDescription($this->parser->getClass(), $this->parser->getNamespace());
+        $class = new ClassDescription($this->parser->getClass(), $this->parser, $this->parser->getNamespace());
         $class->useDoc();
         $hasParent = false;
         if(!is_null($this->parser->getParent())) {

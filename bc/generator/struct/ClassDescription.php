@@ -6,6 +6,9 @@
 
 namespace bc\generator\struct;
 
+use bc\config\ConfigManager;
+use bc\generator\Parser;
+
 class ClassDescription extends Description {
 
     private $namespace;
@@ -17,12 +20,37 @@ class ClassDescription extends Description {
      * @var MethodDescription[]
      */
     private $methods = array();
+
     private $parent;
     private $interfaces = array();
     private $usages = array();
+    private $isAbstract = false;
+    private $isExtend = false;
+    /**
+     * @var Parser
+     */
+    private $parser;
+    /**
+     * @var Parser
+     */
+    private $parentDescription;
 
-    public function __construct($name, $namespace = '') {
+    /**
+     * @param string $name
+     * @param Parser $parser
+     * @param string $namespace
+     */
+    public function __construct($name, $parser, $namespace = '') {
         $this->namespace = $namespace;
+        $this->parser = $parser;
+        $this->isAbstract = $this->parser->isAbstract();
+        if(!is_null($this->parser->getParentDescription())) {
+            $this->parentDescription
+                = new Parser(ConfigManager::get('config/generator')->get('def.path').$this->parser->getParentDescription());
+            if($this->parser->getTable() == $this->parentDescription->getTable()) {
+                $this->isExtend = true;
+            }
+        }
         parent::__construct($name);
     }
 
@@ -34,6 +62,9 @@ class ClassDescription extends Description {
         parent::export($colorize);
         $out = '';
         $out .= $this->insertDoc();
+        if($this->isAbstract) {
+            $out .= 'abstract ';
+        }
         $out .= 'class ';
         $out .= $this->getName();
         if (!is_null($this->parent)) {
@@ -164,6 +195,27 @@ class ClassDescription extends Description {
 
     public function addUsage($usage) {
         $this->usages[] = $usage;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isAbstract() {
+        return $this->isAbstract;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isExtend() {
+        return $this->isExtend;
+    }
+
+    /**
+     * @return Parser
+     */
+    protected function getParent() {
+        return $this->parentDescription;
     }
 
 }

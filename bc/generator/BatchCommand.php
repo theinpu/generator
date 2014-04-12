@@ -23,12 +23,14 @@ class BatchCommand extends Command {
              ->setDescription("пакетная генерация")
              ->addOption('dir', 'd', InputOption::VALUE_OPTIONAL, 'откуда генерим', '.')
              ->addOption('sql', 't', InputOption::VALUE_NONE, 'генерить sql')
+             ->addOption('container', 'c', InputOption::VALUE_NONE, 'генерить контейнер для фабрик')
              ->addOption('json', 'j', InputOption::VALUE_NONE, 'генерить экспорт в json');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $sql = $input->getOption('sql');
         $json = $input->getOption('json');
+        $container = $input->getOption('container');
 
         $cfg = ConfigManager::get('config/generator');
         $this->defPath = $cfg->get('def.path');
@@ -42,21 +44,37 @@ class BatchCommand extends Command {
         foreach($controllers as $controller) {
             exec('./g ctrl -ocr '.$controller, $out);
             if($output->getVerbosity() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
-                $output->writeln($out);
+                echo $out;
             }
         }
 
         $output->writeln('Generating models ('.count($models).')...');
         $out = array();
 
+        $tables = array();
+
         foreach($models as $model) {
             $params = array('o', 'm', 'd', 'f', 'b');
             if($json) $params[] = 'j';
             $cmd = '-'.implode('', $params);
-            exec('./g model '.$cmd.' '.$model, $out);
+            $command = './g model '.$cmd.' '.$model['cmd'];
+            exec($command, $out);
             if($output->getVerbosity() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
-                $output->writeln($out);
+                echo $out;
             }
+            $table = $model['data']['table'];
+            if($sql && !in_array($table, $tables)) {
+                $tables[] = $table;
+            }
+        }
+
+        if($sql) {
+            $output->writeln('Generating sql..');
+            //var_dump($tables);
+        }
+
+        if($container) {
+            $output->writeln('Generating factory container...');
         }
     }
 
@@ -104,7 +122,10 @@ class BatchCommand extends Command {
         foreach($items as $item) {
             $data = $parser->parse(file_get_contents($item));
             if(isset($data['fields'])) {
-                $models[] = str_replace($this->defPath, '', $item);
+                $models[] = array(
+                    'cmd'  => str_replace($this->defPath, '', $item),
+                    'data' => $data
+                );
             }
         }
 
