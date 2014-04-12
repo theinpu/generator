@@ -35,14 +35,14 @@ class ModelGeneratorCommand extends Command {
         $genDataMap = $input->getOption('dataMap');
         $genFactory = $input->getOption('factory');
         $genBuilder = $input->getOption('builder');
-        $genTable = $input->getOption('table');
+        $genTable = false;//$input->getOption('table');
         $genJSON = $input->getOption('json');
         if($input->getOption('all')) {
             $genModel
                 = $genDataMap
                 = $genFactory
                 = $genBuilder
-                = $genTable
+                // $genTable
                 = $genJSON
                 = true;
         }

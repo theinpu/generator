@@ -11,6 +11,7 @@ use bc\config\ConfigManager;
 use bc\generator\parser\Field;
 
 class Parser {
+
     private $savePath;
 
     /**
@@ -24,7 +25,7 @@ class Parser {
 
     public function __construct($file) {
         $this->savePath = ConfigManager::get('config/generator')->get('save.path');
-        if (!file_exists($file)) {
+        if(!file_exists($file)) {
             throw new \RuntimeException(sprintf("File %s not found", $file));
         }
         $parser = new \Symfony\Component\Yaml\Parser();
@@ -42,16 +43,18 @@ class Parser {
      * @return null
      */
     public function getPath($componentName) {
-        if (!isset($this->data['paths']))
-            return '';
-        if (!isset($this->data['paths'][$componentName])) {
+        if(!isset($this->data['paths'])) {
             return '';
         }
-        return '/' . trim($this->data['paths'][$componentName], '/');
+        if(!isset($this->data['paths'][$componentName])) {
+            return '';
+        }
+
+        return '/'.trim($this->data['paths'][$componentName], '/');
     }
 
     public function getNamespace($fullName = null) {
-        if (is_null($fullName)) {
+        if(is_null($fullName)) {
             $fullName = $this->getFullClass();
         }
         $name = explode('\\', $fullName);
@@ -66,7 +69,7 @@ class Parser {
     }
 
     public function getClass() {
-        return str_replace($this->getNamespace($this->getFullClass()) . '\\', '', $this->getFullClass());
+        return str_replace($this->getNamespace($this->getFullClass()).'\\', '', $this->getFullClass());
     }
 
     /**
@@ -77,7 +80,7 @@ class Parser {
     }
 
     public function getParent() {
-        if (!isset($this->data['parent'])) {
+        if(!isset($this->data['parent'])) {
             return null;
         }
 
@@ -93,13 +96,13 @@ class Parser {
     }
 
     public function checkFlag($field, $flag) {
-        if (!isset($this->data['fields'])) {
+        if(!isset($this->data['fields'])) {
             throw new \RuntimeException("No fields found");
         }
-        if (!isset($this->data['fields'][$field])) {
+        if(!isset($this->data['fields'][$field])) {
             throw new \RuntimeException("Field '{$field}' not found");
         }
-        if (!isset($this->data['fields'][$field]['flags'])) {
+        if(!isset($this->data['fields'][$field]['flags'])) {
             return false;
         }
 
@@ -107,19 +110,24 @@ class Parser {
     }
 
     private function parseFields() {
-        if (!isset($this->data['fields'])) return;
-        foreach ($this->data['fields'] as $field => $info) {
+        if(!isset($this->data['fields'])) return;
+        foreach($this->data['fields'] as $field => $info) {
             $this->fields[$field] = new Field($field, $info);
         }
     }
 
     public function generatePath($fullName = null, $ext = 'php') {
-        if (is_null($fullName)) {
+        if(is_null($fullName)) {
             $fullName = $this->getFullClass();
         }
         $pathInfo['path'] = trim($this->getNamespace($fullName), '\\');
         $pathInfo['path'] = str_replace('\\', DIRECTORY_SEPARATOR, $pathInfo)['path'];
-        $pathInfo['file'] = str_replace($this->getNamespace($fullName) . '\\', '', $fullName) . '.' . $ext;
+        $pathInfo['file'] = str_replace($this->getNamespace($fullName).'\\', '', $fullName).'.'.$ext;
+
         return $pathInfo;
+    }
+
+    public function isAbstract() {
+        return isset($this->data['abstract']) ? $this->data['abstract'] : false;
     }
 }

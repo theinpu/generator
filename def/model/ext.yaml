@@ -1,0 +1,12 @@
+name: ExtendExample
+class: \bc\model\example\ExtendExample
+parent: \bc\model\example\Example
+parentDescription: 'model/em.yaml'
+table: example
+fields:
+  content:
+    type: string
+    sqlType: TEXT
+    flags: [NN]
+paths:
+  dataMap: ../dataMaps

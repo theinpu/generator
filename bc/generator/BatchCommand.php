@@ -10,6 +10,7 @@ namespace bc\generator;
 use bc\config\ConfigManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Parser;
 
@@ -19,14 +20,20 @@ class BatchCommand extends Command {
 
     protected function configure() {
         $this->setName('batch')
-             ->setDescription("пакетная генерация");
+             ->setDescription("пакетная генерация")
+             ->addOption('dir', 'd', InputOption::VALUE_OPTIONAL, 'откуда генерим', '.')
+             ->addOption('sql', 't', InputOption::VALUE_NONE, 'генерить sql')
+             ->addOption('json', 'j', InputOption::VALUE_NONE, 'генерить экспорт в json');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
+        $sql = $input->getOption('sql');
+        $json = $input->getOption('json');
+
         $cfg = ConfigManager::get('config/generator');
         $this->defPath = $cfg->get('def.path');
-        $items = $this->getDescriptions($this->defPath);
-
+        $dir = $input->getOption('dir');
+        $items = $this->getDescriptions($this->defPath.trim($dir, '/').'/');
         $controllers = $this->getControllers($items);
         $models = $this->getModels($items);
 
@@ -43,7 +50,10 @@ class BatchCommand extends Command {
         $out = array();
 
         foreach($models as $model) {
-            exec('./g model -oa '.$model, $out);
+            $params = array('o', 'm', 'd', 'f', 'b');
+            if($json) $params[] = 'j';
+            $cmd = '-'.implode('', $params);
+            exec('./g model '.$cmd.' '.$model, $out);
             if($output->getVerbosity() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
                 $output->writeln($out);
             }

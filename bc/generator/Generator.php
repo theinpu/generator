@@ -18,6 +18,7 @@ use bc\generator\struct\ModelFieldDescription;
 use bc\generator\struct\TableDescription;
 
 class Generator {
+
     private $class;
     private $config;
 
@@ -43,12 +44,22 @@ class Generator {
     public function generateModel() {
         $class = new ClassDescription($this->parser->getClass(), $this->parser->getNamespace());
         $class->useDoc();
+        $hasParent = false;
         if(!is_null($this->parser->getParent())) {
             $class->setParent($this->parser->getParent());
         }
-        $fields = array(
-            "'id' => \$this->getId()"
-        );
+        if(!is_null($this->parser->getParentDescription())) {
+            $hasParent = true;
+        }
+        $fields = array();
+
+        if(!$hasParent) {
+            $fields[] = "'id' => \$this->getId()";
+        } else {
+            if($this->parser->getParentDescription() == 'model') {
+                $fields[] = "'id' => \$this->getId()";
+            }
+        }
         foreach($this->parser->getFields() as $name => $info) {
             $field = new ModelFieldDescription($name);
             $field->setModifier('private');
@@ -70,18 +81,34 @@ class Generator {
             $field->setUseGetter($info->getter());
             $field->setUseSetter($info->setter());
             $class->addField($field);
-            $fields[] = "'{$name}' => \$this->".$field->getGetter()->getName().'()';
+            if(!in_array('SO', $info->getFlags())) {
+                $fields[] = "'{$name}' => \$this->".$field->getGetter()->getName().'()';
+            }
         }
         if($this->genJSON) {
-            $class->addInterface('JSONExport');
+            if(!$hasParent) {
+                $class->addInterface('JSONExport');
+            } else {
+                if($this->parser->getParentDescription() == 'model') {
+                    $class->addInterface('JSONExport');
+                }
+            }
             $arrayExport = new MethodDescription('getArray');
             $arrayExport->setType('array');
-            $arrayExport->appendCode("return array(\n".implode(",\n", $fields)."\n);");
+            if($hasParent && $this->parser->getParentDescription() != 'model') {
+                $arrayExport->appendCode("return array(\n".implode(",\n", $fields)."\n) + parent::getArray();");
+            }
+            else {
+                $arrayExport->appendCode("return array(\n".implode(",\n", $fields)."\n);");
+            }
             $class->addMethod($arrayExport);
-            $jsonExport = new MethodDescription('getJSON');
-            $jsonExport->setType('string');
-            $jsonExport->appendCode("return json_encode(\$this->getArray());");
-            $class->addMethod($jsonExport);
+
+            if(!$hasParent) {
+                $jsonExport = new MethodDescription('getJSON');
+                $jsonExport->setType('string');
+                $jsonExport->appendCode("return json_encode(\$this->getArray());");
+                $class->addMethod($jsonExport);
+            }
         }
         $this->model = $class;
         if($this->toFile) {
@@ -90,10 +117,12 @@ class Generator {
             $writer = new ClassWriter($class, $file);
             if($writer->write() === false) {
                 echo "Error: ".print_r(error_get_last(), true)."\n";
-            } else {
+            }
+            else {
                 echo "Saved to ".realpath($file)."\n";
             }
-        } else {
+        }
+        else {
             echo $class->export(false);
         }
     }
@@ -102,7 +131,7 @@ class Generator {
         $table = new TableDescription($this->parser->getTable());
         if(!is_null($this->parser->getParentDescription())) {
             $parent = new Parser(ConfigManager::get('config/generator')
-                                              ->get('def.path').$this->parser->getParentDescription().'.yaml');
+                                              ->get('def.path').$this->parser->getParentDescription());
             foreach($parent->getFields() as $field => $info) {
                 if(is_null($info->getSqlType())) continue;
                 $default = $info->getDefault();
@@ -115,16 +144,22 @@ class Generator {
             $table->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
         }
         $data = $table->export(false);
-        if($this->toFile) {
+        if($this->toFile && !$this->parser->isAbstract()) {
             $path = $this->parser->generatePath($this->parser->getFullClass(), 'sql');
             $file = $this->config->get('save.path').$path['path'].'/'.$path['file'];
 
+            if(file_exists($file)) {
+                unlink($file);
+            }
+
             if(file_put_contents($file, $data) > 0) {
                 echo "Saved to ".realpath($file)."\n";
-            } else {
+            }
+            else {
                 echo "Error: ".print_r(error_get_last(), true)."\n";
             }
-        } else {
+        }
+        else {
             echo $data;
         }
     }
@@ -144,10 +179,12 @@ class Generator {
             }
             if($writer->write() === false) {
                 echo "Error: ".print_r(error_get_last(), true)."\n";
-            } else {
+            }
+            else {
                 echo "Saved to ".realpath($file)."\n";
             }
-        } else {
+        }
+        else {
             echo $class->export(false);
         }
     }
@@ -167,10 +204,12 @@ class Generator {
             }
             if($writer->write() === false) {
                 echo "Error: ".print_r(error_get_last(), true)."\n";
-            } else {
+            }
+            else {
                 echo "Saved to ".realpath($file)."\n";
             }
-        } else {
+        }
+        else {
             echo $class->export(false);
         }
     }
@@ -190,10 +229,12 @@ class Generator {
             }
             if($writer->write() === false) {
                 echo "Error: ".print_r(error_get_last(), true)."\n";
-            } else {
+            }
+            else {
                 echo "Saved to ".realpath($file)."\n";
             }
-        } else {
+        }
+        else {
             echo $class->export(false);
         }
     }
@@ -201,4 +242,4 @@ class Generator {
     public function setGenerateJSON($genJSON) {
         $this->genJSON = $genJSON;
     }
-} 
+}

@@ -3,6 +3,7 @@ class: \bc\model\example\Example
 parent: \bc\model\Model
 parentDescription: model
 table: example
+abstract: true
 fields:
   title:
     type: string
@@ -11,7 +12,7 @@ fields:
   time:
     type: \DateTime
     sqlType: int
-    flags: [NN, RO]
+    flags: [NN, RO, SO]
     ref: getTimestamp
 paths:
   dataMap: ../dataMaps
