@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class BatchCommand extends Command {
 
     private $defPath;
+    private $map = array();
 
     protected function configure() {
         $this->setName('batch')
@@ -70,19 +71,23 @@ class BatchCommand extends Command {
 
         if($sql) {
             $output->writeln('Generating sql ('.count($tables).')..');
+
             foreach($tables as $table => $model) {
+                $output->writeln('generate table '.$table.' from '.$model['name']);
                 $parser = new Parser($model);
                 $item = new TableDescription($table);
 
-                if(!is_null($parser->getParentDescription())) {
-                    $parent = new Parser(ConfigManager::get('config/generator')
-                                                      ->get('def.path').$parser->getParentDescription());
-                    foreach($parent->getFields() as $field => $info) {
+                $p = clone $parser;
+
+                while(!is_null($p->getParentParser())) {
+                    $p = $p->getParentParser();
+                    foreach($p->getFields() as $field => $info) {
                         if(is_null($info->getSqlType())) continue;
                         $default = $info->getDefault();
                         $item->addColumn($field, $info->getSqlType(), $info->getFlags(), $default);
                     }
                 }
+
                 foreach($parser->getFields() as $field => $info) {
                     if(is_null($info->getSqlType())) continue;
                     $default = $info->getDefault();
@@ -93,7 +98,6 @@ class BatchCommand extends Command {
                 if(!file_exists($path)) {
                     mkdir($path);
                 }
-                //var_dump($file);
                 file_put_contents($file, $item->export(false));
             }
         }
@@ -147,7 +151,7 @@ class BatchCommand extends Command {
         foreach($items as $item) {
             $data = $parser->parse(file_get_contents($item));
             if(isset($data['fields'])) {
-                $models[] = array(
+                $models[$data['class']] = array(
                     'cmd'  => str_replace($this->defPath, '', $item),
                     'data' => $data
                 );

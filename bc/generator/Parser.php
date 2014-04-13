@@ -22,6 +22,10 @@ class Parser {
      * @var Field[]
      */
     private $fields = array();
+    /**
+     * @var Parser
+     */
+    private $parentParser = null;
 
     public function __construct($data) {
         $this->savePath = ConfigManager::get('config/generator')->get('save.path');
@@ -35,6 +39,10 @@ class Parser {
             }
             $parser = new \Symfony\Component\Yaml\Parser();
             $this->data = $parser->parse(file_get_contents($file));
+        }
+        if(isset($this->data['parentDescription'])) {
+            $this->parentParser
+                = new Parser(ConfigManager::get('config/generator')->get('def.path').$this->data['parentDescription']);
         }
         $this->parseFields();
     }
@@ -139,5 +147,19 @@ class Parser {
 
     public function getSavePath() {
         return $this->savePath;
+    }
+
+    /**
+     * @param Parser $parent
+     */
+    public function setParentParser($parent) {
+        $this->parentParser = $parent;
+    }
+
+    /**
+     * @return Parser
+     */
+    public function getParentParser() {
+        return $this->parentParser;
     }
 }
