@@ -27,11 +27,14 @@ class BatchCommand extends Command {
              ->addOption('container', 'c', InputOption::VALUE_NONE, 'генерить контейнер для фабрик')
              ->addOption('json', 'j', InputOption::VALUE_NONE, 'генерить экспорт в json');
     }
-    
+
     private function getBinPath(){
-        
-        $path = 'bin/';
-        
+        if(file_exists('vendor/bc/generator')){
+            $path = 'vendor/bin/';
+        } else {
+            $path = 'bin/';
+        };
+
         return $path;
     }
 
@@ -62,16 +65,16 @@ class BatchCommand extends Command {
         $tables = array();
 
         foreach($models as $model) {
-            $params = array('o', 'm', 'd', 'f', 'b');
-            if($json) $params[] = 'j';
+            $params = array('o', 'a');
+//            if($json) $params[] = 'j';
             $cmd = '-'.implode('', $params);
             
             $binPath = 'php ' . $this->getBinPath() . 'gen ';
-            $command = $binPath . 'model '.$cmd.' '.$model['cmd'];
+            $command = $binPath . 'model '. $cmd . ' ' . $model['cmd'];
 
             exec($command, $out);
             if($output->getVerbosity() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
-                echo $out;
+               echo $out;
             }
             $table = $model['data']['table'];
             if($sql && !isset($tables[$table])) {
