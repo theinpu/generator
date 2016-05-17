@@ -34,7 +34,6 @@ class BatchCommand extends Command {
         } else {
             $path = 'bin/';
         };
-
         return $path;
     }
 
