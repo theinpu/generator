@@ -27,6 +27,13 @@ class BatchCommand extends Command {
              ->addOption('container', 'c', InputOption::VALUE_NONE, 'генерить контейнер для фабрик')
              ->addOption('json', 'j', InputOption::VALUE_NONE, 'генерить экспорт в json');
     }
+    
+    private function getBinPath(){
+        
+        $path = 'bin/';
+        
+        return $path;
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $sql = $input->getOption('sql');
@@ -43,7 +50,7 @@ class BatchCommand extends Command {
         $output->writeln('Generating controllers ('.count($controllers).')...');
 
         foreach($controllers as $controller) {
-            exec('./g ctrl -ocr '.$controller, $out);
+            exec('./bin/gen ctrl -ocr '.$controller, $out);
             if($output->getVerbosity() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
                 echo $out;
             }
@@ -58,7 +65,10 @@ class BatchCommand extends Command {
             $params = array('o', 'm', 'd', 'f', 'b');
             if($json) $params[] = 'j';
             $cmd = '-'.implode('', $params);
-            $command = './g model '.$cmd.' '.$model['cmd'];
+            
+            $binPath = 'php ' . $this->getBinPath() . 'gen ';
+            $command = $binPath . 'model '.$cmd.' '.$model['cmd'];
+
             exec($command, $out);
             if($output->getVerbosity() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
                 echo $out;
