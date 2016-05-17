@@ -10,9 +10,6 @@ if(file_exists('vendor/bc/generator')){
     chdir(__DIR__.'/..');
 }
 
-
-
-
 $cli = new \bc\generator\GeneratorCLI();
 
 $cli->run();
